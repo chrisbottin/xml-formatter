@@ -1,0 +1,35 @@
+{
+  "name": "xml-formatter",
+  "version": "1.0.0",
+  "description": "Converts XML into a human readable format (pretty print) while respecting the xml:space attribute",
+  "main": "index.js",
+  "scripts": {
+    "test": "node_modules/.bin/mocha",
+    "browserify": "node_modules/.bin/browserify -r ./index.js:xml-formatter -o ./browser/xml-formatter.js"
+  },
+  "keywords": [
+    "xml",
+    "pretty-print",
+    "indent",
+    "parser",
+    "formatter",
+    "xml:space",
+    "preserve"
+  ],
+  "author": "Chris Bottin",
+  "license": "MIT",
+  "dependencies": {
+    "xml-parser-xo": "^2.1.1"
+  },
+  "devDependencies": {
+    "browserify": "^13.1.1",
+    "chai": "^3.5.0",
+    "gulp": "^3.9.1",
+    "mocha": "^2.2.5",
+    "should": "^6.0.3",
+    "stream-assert": "^2.0.3"
+  },
+  "browser": {
+    "util": false
+  }
+}
