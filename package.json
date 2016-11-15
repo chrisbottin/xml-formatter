@@ -1,6 +1,7 @@
 {
   "name": "xml-formatter",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "repository": "chrisbottin/xml-formatter",
   "description": "Converts XML into a human readable format (pretty print) while respecting the xml:space attribute",
   "main": "index.js",
   "scripts": {
