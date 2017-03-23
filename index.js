@@ -1,5 +1,5 @@
 function newLine(output) {
-    output.content += '\n';
+    output.content += '\r\n';
     var i;
     for (i = 0; i < output.level; i++) {
         output.content += output.options.indentation;

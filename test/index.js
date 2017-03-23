@@ -14,6 +14,8 @@ describe('XML formatter', function () {
                 var formattedContents = formatter(file.contents.toString('utf8'), {debug: false});
                 var expectedContents = fs.readFileSync(file.path.replace('-input', '-output')).toString('utf8');
 
+                expectedContents = expectedContents.replace(/\r/g, '').replace(/\n/g, '\r\n');
+
                 assert.equal(expectedContents, formattedContents, 'Formatted Content for ' + path.basename(file.path));
             }))
             .pipe(streamAssert.end(done));
@@ -33,6 +35,8 @@ describe('XML formatter', function () {
             .pipe(streamAssert.all(function(file) {
                 var formattedContents = formatter(file.contents.toString('utf8'), {debug: false, stripComments: true});
                 var expectedContents = fs.readFileSync(file.path.replace('-input', '-output')).toString('utf8');
+
+                expectedContents = expectedContents.replace(/\r/g, '').replace(/\n/g, '\r\n');
 
                 assert.equal(expectedContents, formattedContents, 'Formatted Content for ' + path.basename(file.path));
             }))
