@@ -21,7 +21,7 @@ $ npm install xml-formatter
 
 ```js
 var format = require('xml-formatter');
-var xml = '<root><!-- content --><content><p xml:space="preserve">This is <b>some</b> content.</content></p>';
+var xml = '<root>content><p xml:space="preserve">This is <b>some</b> content.</content></p>';
 
 var formattedXml = format(xml);
 console.log(formattedXml);
@@ -31,7 +31,6 @@ Output:
 
 ```xml
 <root>
-    <!-- test -->
     <content>
         <p xml:space="preserve">This is <b>some</b> content.</p>
     </content>
@@ -44,9 +43,9 @@ Output:
  
 ```js
 var format = require('xml-formatter');
-var xml = '<root><!-- content --><content><p xml:space="preserve">This is <b>some</b> content.</content></p>';
+var xml = '<root><!-- content --><content><p>This is <b>some</b> content.</content></p>';
 
-var options = {indentation: '  ', stripComments: true};
+var options = {indentation: '  ', stripComments: true, collapseContent: true};
 var formattedXml = format(xml, options);
 
 console.log(formattedXml);
@@ -57,7 +56,7 @@ Output:
 ```xml
 <root>
   <content>
-    <p xml:space="preserve">This is <b>some</b> content.</p>
+    <p>This is <b>some</b> content.</p>
   </content>
 </root>
 ```
@@ -65,6 +64,7 @@ Output:
 - `stripComments` (Boolean, default=`true`) True to strip the comments.
 - `indentation` (String, default=`'    '`) The value used for indentation.
 - `debug` (Boolean, default=`false`) Displays a tree of the parsed XML before formatting.
+- `collapseContent` (Boolean, default=`false`] True to keep content in the same line as the element. Only works if element contains at least one text node
 
 
 ## On The Browser
