@@ -45,6 +45,17 @@ function processElement(node, output, preserveSpace) {
 
         var nodePreserveSpace = node.attributes['xml:space'] === 'preserve';
 
+        if (!nodePreserveSpace && output.options.collapseContent) {
+
+            var containsTextNodes = node.children.some(function(child) {
+                return child.name === '#text';
+            });
+
+            if (containsTextNodes) {
+                nodePreserveSpace = true;
+            }
+        }
+
         node.children.forEach(function(child) {
             processNode(child, output, preserveSpace || nodePreserveSpace);
         });
@@ -81,6 +92,7 @@ function processDeclaration(declaration, output) {
  *  @config {Boolean} [debug=false] displays a tree of the parsed XML before formatting
  *  @config {String} [indentation='    '] The value used for indentation
  *  @config {Boolean} [stripComments=false] True to strip the comments
+ *  @config {Boolean} [collapseContent=false] True to keep content in the same line as the element. Only works if element contains at least one text node
  * @returns {string}
  */
 function format(xml, options) {
@@ -89,6 +101,7 @@ function format(xml, options) {
     options.debug = options.debug === true;
     options.indentation = options.indentation || '    ';
     options.stripComments = options.stripComments === true;
+    options.collapseContent = options.collapseContent === true;
 
     var parse = require('xml-parser-xo');
     var parsedXml = parse(xml, {stripComments: options.stripComments});
