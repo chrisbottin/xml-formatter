@@ -1,4 +1,4 @@
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+require=(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 
 },{}],2:[function(require,module,exports){
 module.exports = function() {
@@ -223,7 +223,7 @@ function parse(xml, options) {
 
 },{"debug":2}],"xml-formatter":[function(require,module,exports){
 function newLine(output) {
-    output.content += '\n';
+    output.content += output.options.lineSeparator;
     var i;
     for (i = 0; i < output.level; i++) {
         output.content += output.options.indentation;
@@ -269,6 +269,17 @@ function processElement(node, output, preserveSpace) {
 
         var nodePreserveSpace = node.attributes['xml:space'] === 'preserve';
 
+        if (!nodePreserveSpace && output.options.collapseContent) {
+
+            var containsTextNodes = node.children.some(function(child) {
+                return child.name === '#text';
+            });
+
+            if (containsTextNodes) {
+                nodePreserveSpace = true;
+            }
+        }
+
         node.children.forEach(function(child) {
             processNode(child, output, preserveSpace || nodePreserveSpace);
         });
@@ -305,6 +316,8 @@ function processDeclaration(declaration, output) {
  *  @config {Boolean} [debug=false] displays a tree of the parsed XML before formatting
  *  @config {String} [indentation='    '] The value used for indentation
  *  @config {Boolean} [stripComments=false] True to strip the comments
+ *  @config {Boolean} [collapseContent=false] True to keep content in the same line as the element. Only works if element contains at least one text node
+ *  @config {String} [lineSeparator='\r\n'] The line separator to use
  * @returns {string}
  */
 function format(xml, options) {
@@ -313,6 +326,8 @@ function format(xml, options) {
     options.debug = options.debug === true;
     options.indentation = options.indentation || '    ';
     options.stripComments = options.stripComments === true;
+    options.collapseContent = options.collapseContent === true;
+    options.lineSeparator = options.lineSeparator || '\r\n';
 
     var parse = require('xml-parser-xo');
     var parsedXml = parse(xml, {stripComments: options.stripComments});
@@ -335,4 +350,5 @@ function format(xml, options) {
 
 
 module.exports = format;
+
 },{"util":1,"xml-parser-xo":3}]},{},[]);

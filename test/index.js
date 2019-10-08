@@ -12,11 +12,9 @@ describe('XML formatter', function () {
             .pipe(streamAssert.all(function(file) {
                 var formattedContents = formatter(file.contents.toString('utf8'), formatterOptions);
                 var expectedContents = fs.readFileSync(file.path.replace('-input', '-output')).toString('utf8');
+                var lineSeparator = formatterOptions.lineSeparator || '\r\n';
 
-                expectedContents = expectedContents.replace(/\r/g, '').replace(/\n/g, '\r\n');
-
-                console.log(expectedContents);
-                console.log(formattedContents);
+                expectedContents = expectedContents.replace(/\r/g, '').replace(/\n/g, lineSeparator);
 
                 assert.equal(expectedContents, formattedContents, 'Formatted Content for ' + path.relative(process.cwd(), file.path));
             }))
@@ -36,5 +34,15 @@ describe('XML formatter', function () {
     it('should format input XML files correctly without indenting text content when option is enabled', function(done) {
         assertFormatter('test/data3/xml*-input.xml', {debug: false, stripComments: false, collapseContent: true}, done);
     });
+
+    it.skip('should format input XML files with DOCTYPE correctly - TODO https://github.com/chrisbottin/xml-formatter/issues/8', function(done) {
+        assertFormatter('test/data4/xml*-input.xml', {debug: false, stripComments: false, collapseContent: true}, done);
+    });
+
+    it('should format input XML files with the custom line separator', function(done) {
+        assertFormatter('test/data5/xml*-input.xml', {lineSeparator: '\n'}, done);
+    });
+
+
 
 });

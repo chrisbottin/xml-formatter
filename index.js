@@ -1,5 +1,5 @@
 function newLine(output) {
-    output.content += '\r\n';
+    output.content += output.options.lineSeparator;
     var i;
     for (i = 0; i < output.level; i++) {
         output.content += output.options.indentation;
@@ -93,6 +93,7 @@ function processDeclaration(declaration, output) {
  *  @config {String} [indentation='    '] The value used for indentation
  *  @config {Boolean} [stripComments=false] True to strip the comments
  *  @config {Boolean} [collapseContent=false] True to keep content in the same line as the element. Only works if element contains at least one text node
+ *  @config {String} [lineSeparator='\r\n'] The line separator to use
  * @returns {string}
  */
 function format(xml, options) {
@@ -102,6 +103,7 @@ function format(xml, options) {
     options.indentation = options.indentation || '    ';
     options.stripComments = options.stripComments === true;
     options.collapseContent = options.collapseContent === true;
+    options.lineSeparator = options.lineSeparator || '\r\n';
 
     var parse = require('xml-parser-xo');
     var parsedXml = parse(xml, {stripComments: options.stripComments});
