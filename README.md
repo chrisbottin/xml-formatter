@@ -73,7 +73,7 @@ Output:
  Page:
  
 ```html
-<script type="text/javascript" src="browser/xml-formatter.js"></script>
+<script type="text/javascript" src="dist/browser/xml-formatter.js"></script>
 ```
 
  Usage:
