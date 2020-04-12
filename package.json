@@ -8,6 +8,9 @@
     "test": "node_modules/.bin/mocha",
     "browserify": "node_modules/.bin/browserify -r ./index.js:xml-formatter -o ./browser/xml-formatter.js"
   },
+  "engines": {
+    "node": ">= 10"
+  },
   "keywords": [
     "xml",
     "pretty-print",
