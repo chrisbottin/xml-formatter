@@ -45,8 +45,12 @@ Output:
 var format = require('xml-formatter');
 var xml = '<root><!-- content --><content><p>This is <b>some</b> content.</content></p>';
 
-var options = {indentation: '  ', stripComments: true, collapseContent: true, lineSeparator: '\n'};
-var formattedXml = format(xml, options);
+var formattedXml = format(xml, {
+    indentation: '  ', 
+    filter: (node) => node.type !== 'Comment', 
+    collapseContent: true, 
+    lineSeparator: '\n'
+});
 
 console.log(formattedXml);
 ```
@@ -61,9 +65,8 @@ Output:
 </root>
 ```
 
-- `stripComments` (Boolean, default=`true`) True to strip the comments.
+- `filter` (function(node)) Function to filter out unwanted nodes by returning false.
 - `indentation` (String, default=`'    '`) The value used for indentation.
-- `debug` (Boolean, default=`false`) Displays a tree of the parsed XML before formatting.
 - `collapseContent` (Boolean, default=`false`] True to keep content in the same line as the element. Only works if element contains at least one text node
 - `lineSeparator` (String, default=`\r\n`) Specify the line separator to use
 

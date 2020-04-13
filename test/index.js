@@ -1,48 +1,48 @@
+const assert = require('chai').assert;
+const glob = require('glob');
+const path = require('path');
+const fs = require('fs');
+const format = require('../index');
+
 describe('XML formatter', function () {
 
-    const assertFormatter = function(src, formatterOptions, done) {
-        var gulp = require('gulp'),
-            fs = require('fs'),
-            path = require('path'),
-            streamAssert = require('stream-assert'),
-            assert = require('chai').assert,
-            formatter = require('../index.js');
+    const assertFormat = function(src, formatterOptions, done) {
+        glob(src, function(er, files) {
 
-        gulp.src(src)
-            .pipe(streamAssert.all(function(file) {
-                var formattedContents = formatter(file.contents.toString('utf8'), formatterOptions);
-                var expectedContents = fs.readFileSync(file.path.replace('-input', '-output')).toString('utf8');
-                var lineSeparator = formatterOptions.lineSeparator || '\r\n';
+            files.forEach(file => {
+                const fileContents = fs.readFileSync(file).toString('utf8');
+                const formattedContents = format(fileContents, formatterOptions);
+                let expectedContents = fs.readFileSync(file.replace('-input', '-output')).toString('utf8');
+                const lineSeparator = formatterOptions.lineSeparator || '\r\n';
 
                 expectedContents = expectedContents.replace(/\r/g, '').replace(/\n/g, lineSeparator);
 
-                assert.equal(expectedContents, formattedContents, 'Formatted Content for ' + path.relative(process.cwd(), file.path));
-            }))
-            .pipe(streamAssert.end(done));
-    };
+                assert.equal(formattedContents, expectedContents, 'Formatted Content for ' + path.relative(process.cwd(), file));
+            });
 
-    it('should format input XML files correctly with comments', function(done) {
-        assertFormatter('test/data1/xml*-input.xml', {debug: false}, done);
+            done();
+        });
+    }
+
+    it('should format XML with comments', function(done) {
+        assertFormat('test/data1/xml*-input.xml', {}, done);
     });
 
 
-    it('should format input XML files correctly without comments', function(done) {
-        assertFormatter('test/data2/xml*-input.xml', {debug: false, stripComments: true}, done);
+    it('should format XML without comments', function(done) {
+        assertFormat('test/data2/xml*-input.xml', {filter: (node) => node.type !== 'Comment'}, done);
     });
 
-
-    it('should format input XML files correctly without indenting text content when option is enabled', function(done) {
-        assertFormatter('test/data3/xml*-input.xml', {debug: false, stripComments: false, collapseContent: true}, done);
+    it('should format XML without indenting text content when option is enabled', function(done) {
+        assertFormat('test/data3/xml*-input.xml', {collapseContent: true}, done);
     });
 
-    it.skip('should format input XML files with DOCTYPE correctly - TODO https://github.com/chrisbottin/xml-formatter/issues/8', function(done) {
-        assertFormatter('test/data4/xml*-input.xml', {debug: false, stripComments: false, collapseContent: true}, done);
+    it('should format XML with various node types', function(done) {
+        assertFormat('test/data4/xml*-input.xml', {}, done);
     });
 
-    it('should format input XML files with the custom line separator', function(done) {
-        assertFormatter('test/data5/xml*-input.xml', {lineSeparator: '\n'}, done);
+    it('should format XML with the custom line separator', function(done) {
+        assertFormat('test/data5/xml*-input.xml', {lineSeparator: '\n'}, done);
     });
-
-
 
 });
