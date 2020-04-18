@@ -1,20 +1,28 @@
 {
   "name": "xml-formatter",
-  "version": "1.2.1",
-  "repository": "chrisbottin/xml-formatter",
-  "description": "Converts XML into a human readable format (pretty print) while respecting the xml:space attribute",
+  "version": "2.0.0",
+  "repository": "github:chrisbottin/xml-formatter",
+  "bugs": {
+    "url": "https://github.com/chrisbottin/xml-formatter/issues"
+  },
+  "homepage": "https://github.com/chrisbottin/xml-formatter#readme",
+  "description": "Converts a XML string into a human readable format (pretty print) while respecting the xml:space attribute",
+  "author": "Chris Bottin <chrisbottin@gmail.com>",
+  "license": "MIT",
   "main": "index.js",
   "scripts": {
-    "test": "node_modules/.bin/mocha",
-    "prepublishOnly": "npm test && npm run dist:prepare && npm run dist:build",
+    "test": "mocha",
+    "prepublishOnly": "eslint . && npm test && npm run dist:prepare && npm run dist:build",
     "dist:prepare": "rm -rf ./dist && mkdir -p ./dist/browser",
-    "dist:build": "node_modules/.bin/browserify -r ./index.js:xml-formatter -o ./dist/browser/xml-formatter.js"
+    "dist:build": "browserify -r ./index.js:xml-formatter -o ./dist/browser/xml-formatter.js"
   },
   "engines": {
     "node": ">= 10"
   },
   "keywords": [
     "xml",
+    "pretty",
+    "print",
     "pretty-print",
     "indent",
     "parser",
@@ -22,19 +30,14 @@
     "xml:space",
     "preserve"
   ],
-  "author": "Chris Bottin",
-  "license": "MIT",
   "dependencies": {
-    "xml-parser-xo": "^2.1.1"
+    "xml-parser-xo": "^3.0.0"
   },
   "devDependencies": {
     "browserify": "^13.1.1",
-    "chai": "^3.5.0",
-    "gulp": "^4.0.2",
-    "mocha": "^6.2.1",
-    "stream-assert": "^2.0.3"
-  },
-  "browser": {
-    "util": false
+    "chai": "^4.2.0",
+    "eslint": "^6.8.0",
+    "glob": "^7.1.6",
+    "mocha": "^6.2.1"
   }
 }

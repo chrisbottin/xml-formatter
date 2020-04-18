@@ -1,6 +1,6 @@
 function newLine(output) {
     output.content += output.options.lineSeparator;
-    var i;
+    let i;
     for (i = 0; i < output.level; i++) {
         output.content += output.options.indentation;
     }
@@ -11,11 +11,14 @@ function appendContent(output, content) {
 }
 
 function processNode(node, output, preserveSpace) {
-    if (node.name === '#text' || node.name === '#comment') {
+    if (typeof node.content === 'string') {
         processContentNode(node, output, preserveSpace);
-    } else {
-        // Assuming that we only have 3 types of node (#text, #comment and element)
+    } else if (node.type === 'Element') {
         processElement(node, output, preserveSpace);
+    } else if (node.type === 'ProcessingInstruction') {
+        processProcessingIntruction(node, output, preserveSpace);
+    } else {
+        throw new Error('Unknown node type: ' + node.type);
     }
 }
 
@@ -37,18 +40,21 @@ function processElement(node, output, preserveSpace) {
     if (node.children === null) {
         // self-closing node
         appendContent(output, '/>');
+    } else if (node.children.length === 0) {
+        // empty node
+        appendContent(output, '></' + node.name + '>');
     } else {
 
         appendContent(output, '>');
 
         output.level++;
 
-        var nodePreserveSpace = node.attributes['xml:space'] === 'preserve';
+        let nodePreserveSpace = node.attributes['xml:space'] === 'preserve';
 
         if (!nodePreserveSpace && output.options.collapseContent) {
 
-            var containsTextNodes = node.children.some(function(child) {
-                return child.name === '#text';
+            const containsTextNodes = node.children.some(function(child) {
+                return child.type === 'Text';
             });
 
             if (containsTextNodes) {
@@ -75,12 +81,13 @@ function processAttributes(output, attributes) {
     });
 }
 
-function processDeclaration(declaration, output) {
-    if (declaration) {
-        appendContent(output, '<?xml');
-        processAttributes(output, declaration.attributes);
-        appendContent(output, '?>');
+function processProcessingIntruction(node, output) {
+    if (output.content.length > 0) {
+        newLine(output);
     }
+    appendContent(output, '<?' + node.name);
+    processAttributes(output, node.attributes);
+    appendContent(output, '?>');
 }
 
 
@@ -89,33 +96,26 @@ function processDeclaration(declaration, output) {
  *
  * @param {String} xml
  * @param {Object} options
- *  @config {Boolean} [debug=false] displays a tree of the parsed XML before formatting
  *  @config {String} [indentation='    '] The value used for indentation
- *  @config {Boolean} [stripComments=false] True to strip the comments
+ *  @config {function(node)} [filter] Return false to exclude the node.
  *  @config {Boolean} [collapseContent=false] True to keep content in the same line as the element. Only works if element contains at least one text node
  *  @config {String} [lineSeparator='\r\n'] The line separator to use
  * @returns {string}
  */
-function format(xml, options) {
+function format(xml, options = {}) {
 
     options = options || {};
-    options.debug = options.debug === true;
     options.indentation = options.indentation || '    ';
-    options.stripComments = options.stripComments === true;
     options.collapseContent = options.collapseContent === true;
     options.lineSeparator = options.lineSeparator || '\r\n';
 
-    var parse = require('xml-parser-xo');
-    var parsedXml = parse(xml, {stripComments: options.stripComments});
+    const parse = require('xml-parser-xo');
+    const parsedXml = parse(xml, {filter: options.filter});
+    const output = {content: '', level: 0, options: options};
 
-    if (options.debug) {
-        var inspect = require('util').inspect;
-        console.log(inspect(parsedXml, { colors: true, depth: Infinity }));
+    if (parsedXml.declaration) {
+        processProcessingIntruction(parsedXml.declaration, output);
     }
-
-    var output = {content: '', level: 0, options: options};
-
-    processDeclaration(parsedXml.declaration, output);
 
     parsedXml.children.forEach(function(child) {
         processNode(child, output, false);
