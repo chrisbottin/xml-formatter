@@ -23,10 +23,12 @@ function processNode(node, output, preserveSpace) {
 }
 
 function processContentNode(node, output, preserveSpace) {
-    if (!preserveSpace && output.content.length > 0) {
-        newLine(output);
+    if (node.content.trim() !== '' || preserveSpace) {
+      if (!preserveSpace && output.content.length > 0) {
+          newLine(output);
+      }
+      appendContent(output, node.content);
     }
-    appendContent(output, node.content);
 }
 
 function processElement(node, output, preserveSpace) {
@@ -54,7 +56,7 @@ function processElement(node, output, preserveSpace) {
         if (!nodePreserveSpace && output.options.collapseContent) {
 
             const containsTextNodes = node.children.some(function(child) {
-                return child.type === 'Text';
+                return child.type === 'Text' && child.content.trim() !== '';
             });
 
             if (containsTextNodes) {
