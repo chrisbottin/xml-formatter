@@ -45,4 +45,8 @@ describe('XML formatter', function () {
         assertFormat('test/data5/xml*-input.xml', {lineSeparator: '\n'}, done);
     });
 
+    it('should format XML that already contains line breaks', function(done) {
+        assertFormat('test/data6/xml*-input.xml', {}, done);
+    });
+
 });
