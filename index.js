@@ -1,3 +1,17 @@
+/**
+ * @typedef {Object} XMLFormatterOptions
+ *  @property {string} [indentation='    '] The value used for indentation
+ *  @property {function(node): boolean} [filter] Return false to exclude the node.
+ *  @property {boolean} [collapseContent=false] True to keep content in the same line as the element. Only works if element contains at least one text node
+ *  @property {string} [lineSeparator='\r\n'] The line separator to use
+ *   @property {string} [whiteSpaceAtEndOfSelfclosingTag=false] to either end ad self closing tag with `<tag/>` or `<tag />`
+ */
+
+
+/**
+ * 
+ * @param {*} output 
+ */
 function newLine(output) {
     output.content += output.options.lineSeparator;
     let i;
@@ -10,11 +24,14 @@ function appendContent(output, content) {
     output.content += content;
 }
 
-function processNode(node, output, preserveSpace) {
+/**
+ * @param {XMLFormatterOptions} options 
+ */
+function processNode(node, output, preserveSpace, options) {
     if (typeof node.content === 'string') {
         processContentNode(node, output, preserveSpace);
     } else if (node.type === 'Element') {
-        processElement(node, output, preserveSpace);
+        processElement(node, output, preserveSpace, options);
     } else if (node.type === 'ProcessingInstruction') {
         processProcessingIntruction(node, output, preserveSpace);
     } else {
@@ -31,7 +48,10 @@ function processContentNode(node, output, preserveSpace) {
     }
 }
 
-function processElement(node, output, preserveSpace) {
+/**
+ * @param {XMLFormatterOptions} options 
+ */
+function processElement(node, output, preserveSpace, options) {
     if (!preserveSpace && output.content.length > 0) {
         newLine(output);
     }
@@ -40,8 +60,9 @@ function processElement(node, output, preserveSpace) {
     processAttributes(output, node.attributes);
 
     if (node.children === null) {
+        const selfClosingNodeClosingTag = options.whiteSpaceAtEndOfSelfclosingTag ? ' />' : '/>'
         // self-closing node
-        appendContent(output, '/>');
+        appendContent(output, selfClosingNodeClosingTag);
     } else if (node.children.length === 0) {
         // empty node
         appendContent(output, '></' + node.name + '>');
@@ -65,7 +86,7 @@ function processElement(node, output, preserveSpace) {
         }
 
         node.children.forEach(function(child) {
-            processNode(child, output, preserveSpace || nodePreserveSpace);
+            processNode(child, output, preserveSpace || nodePreserveSpace, options);
         });
 
         output.level--;
@@ -97,11 +118,12 @@ function processProcessingIntruction(node, output) {
  * Converts the given XML into human readable format.
  *
  * @param {String} xml
- * @param {Object} options
+ * @param {XMLFormatterOptions} options
  *  @config {String} [indentation='    '] The value used for indentation
- *  @config {function(node)} [filter] Return false to exclude the node.
+ *  @config {function(node): boolean} [filter] Return false to exclude the node.
  *  @config {Boolean} [collapseContent=false] True to keep content in the same line as the element. Only works if element contains at least one text node
  *  @config {String} [lineSeparator='\r\n'] The line separator to use
+ *  @config {string} [whiteSpaceAtEndOfSelfclosingTag=false] to either end with `<tag/>` or `<tag />`
  * @returns {string}
  */
 function format(xml, options = {}) {
@@ -110,6 +132,7 @@ function format(xml, options = {}) {
     options.indentation = options.indentation || '    ';
     options.collapseContent = options.collapseContent === true;
     options.lineSeparator = options.lineSeparator || '\r\n';
+    options.whiteSpaceAtEndOfSelfclosingTag = !!options.whiteSpaceAtEndOfSelfclosingTag;
 
     const parse = require('xml-parser-xo');
     const parsedXml = parse(xml, {filter: options.filter});
@@ -120,7 +143,7 @@ function format(xml, options = {}) {
     }
 
     parsedXml.children.forEach(function(child) {
-        processNode(child, output, false);
+        processNode(child, output, false, options);
     });
 
     return output.content;
