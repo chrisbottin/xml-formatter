@@ -69,6 +69,7 @@ Output:
 - `indentation` (String, default=`'    '`) The value used for indentation.
 - `collapseContent` (Boolean, default=`false`] True to keep content in the same line as the element. Only works if element contains at least one text node
 - `lineSeparator` (String, default=`\r\n`) Specify the line separator to use
+- `whiteSpaceAtEndOfSelfclosingTag` (Boolean, default=false) to either end ad self closing tag with `<tag/>` or `<tag />`
 
 
 ## On The Browser

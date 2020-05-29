@@ -48,5 +48,9 @@ describe('XML formatter', function () {
     it('should format XML that already contains line breaks', function(done) {
         assertFormat('test/data6/xml*-input.xml', {}, done);
     });
+  
+      it('should format XML adding a whitespace before self closing tag', function(done) {
+        assertFormat('test/data7_white-space-on-closing-tag/xml*-input.xml', {whiteSpaceAtEndOfSelfclosingTag: true}, done);
+    });
 
 });
