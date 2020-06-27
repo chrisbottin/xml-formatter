@@ -40,11 +40,14 @@ function processNode(node, output, preserveSpace, options) {
 }
 
 function processContentNode(node, output, preserveSpace) {
-    if (node.content.trim() !== '' || preserveSpace) {
-      if (!preserveSpace && output.content.length > 0) {
-          newLine(output);
-      }
-      appendContent(output, node.content);
+    if (!preserveSpace) {
+        node.content = node.content.trim();
+    }
+    if (node.content.length > 0) {
+        if (!preserveSpace && output.content.length > 0) {
+            newLine(output);
+        }
+        appendContent(output, node.content);
     }
 }
 

@@ -12,12 +12,15 @@ describe('XML formatter', function () {
             files.forEach(file => {
                 const fileContents = fs.readFileSync(file).toString('utf8');
                 const formattedContents = format(fileContents, formatterOptions);
+                const formattedContents2 = format(formattedContents, formatterOptions);
                 let expectedContents = fs.readFileSync(file.replace('-input', '-output')).toString('utf8');
                 const lineSeparator = formatterOptions.lineSeparator || '\r\n';
+                const relativeFilePath = path.relative(process.cwd(), file);
 
                 expectedContents = expectedContents.replace(/\r/g, '').replace(/\n/g, lineSeparator);
 
-                assert.equal(formattedContents, expectedContents, 'Formatted Content for ' + path.relative(process.cwd(), file));
+                assert.equal(formattedContents, expectedContents, 'Formatted Content for ' + relativeFilePath);
+                assert.equal(formattedContents2, expectedContents, 'Idempotence test for ' + relativeFilePath);
             });
 
             done();
@@ -27,7 +30,6 @@ describe('XML formatter', function () {
     it('should format XML with comments', function(done) {
         assertFormat('test/data1/xml*-input.xml', {}, done);
     });
-
 
     it('should format XML without comments', function(done) {
         assertFormat('test/data2/xml*-input.xml', {filter: (node) => node.type !== 'Comment'}, done);
@@ -49,7 +51,7 @@ describe('XML formatter', function () {
         assertFormat('test/data6/xml*-input.xml', {}, done);
     });
   
-      it('should format XML adding a whitespace before self closing tag', function(done) {
+    it('should format XML adding a whitespace before self closing tag', function(done) {
         assertFormat('test/data7_white-space-on-closing-tag/xml*-input.xml', {whiteSpaceAtEndOfSelfclosingTag: true}, done);
     });
 

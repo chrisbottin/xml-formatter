@@ -4,7 +4,7 @@
 <!DOCTYPE foo SYSTEM "foo.dtd">
 <foo>
     <![CDATA[some text]]>
-     and 
+    and
     <bar>
         some more
     </bar>
