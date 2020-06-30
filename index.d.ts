@@ -1,6 +1,6 @@
 type FormatOptions = {
     indentation?: string;
-    filter: (node: any) => boolean;
+    filter?: (node: any) => boolean;
     stripComments?: boolean;
     collapseContent?: boolean;
     lineSeparator?: string;
