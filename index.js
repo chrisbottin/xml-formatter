@@ -1,12 +1,13 @@
 /**
- * @typedef {Object} XMLFormatterOptions
+ *  @typedef {Object} XMLFormatterOptions
  *  @property {string} [indentation='    '] The value used for indentation
  *  @property {function(node): boolean} [filter] Return false to exclude the node.
  *  @property {boolean} [collapseContent=false] True to keep content in the same line as the element. Only works if element contains at least one text node
  *  @property {string} [lineSeparator='\r\n'] The line separator to use
- *   @property {string} [whiteSpaceAtEndOfSelfclosingTag=false] to either end ad self closing tag with `<tag/>` or `<tag />`
+ *  @property {string} [whiteSpaceAtEndOfSelfclosingTag=false] to either end ad self closing tag with `<tag/>` or `<tag />`
  */
 
+const parse = require('xml-parser-xo');
 
 /**
  * 
@@ -14,18 +15,26 @@
  */
 function newLine(output) {
     output.content += output.options.lineSeparator;
-    let i;
-    for (i = 0; i < output.level; i++) {
+    for (let i = 0; i < output.level; i++) {
         output.content += output.options.indentation;
     }
 }
 
+/**
+ * 
+ * @param {*} output 
+ * @param {*} content 
+ */
 function appendContent(output, content) {
     output.content += content;
 }
 
 /**
- * @param {XMLFormatterOptions} options 
+ * 
+ * @param {*} node 
+ * @param {*} output 
+ * @param {*} preserveSpace 
+ * @param {*} options 
  */
 function processNode(node, output, preserveSpace, options) {
     if (typeof node.content === 'string') {
@@ -39,10 +48,17 @@ function processNode(node, output, preserveSpace, options) {
     }
 }
 
+/**
+ * 
+ * @param {*} node 
+ * @param {*} output 
+ * @param {*} preserveSpace 
+ */
 function processContentNode(node, output, preserveSpace) {
     if (!preserveSpace) {
         node.content = node.content.trim();
     }
+
     if (node.content.length > 0) {
         if (!preserveSpace && output.content.length > 0) {
             newLine(output);
@@ -52,7 +68,11 @@ function processContentNode(node, output, preserveSpace) {
 }
 
 /**
- * @param {XMLFormatterOptions} options 
+ * 
+ * @param {*} node 
+ * @param {*} output 
+ * @param {*} preserveSpace 
+ * @param {*} options 
  */
 function processElement(node, output, preserveSpace, options) {
     if (!preserveSpace && output.content.length > 0) {
@@ -63,14 +83,13 @@ function processElement(node, output, preserveSpace, options) {
     processAttributes(output, node.attributes);
 
     if (node.children === null) {
-        const selfClosingNodeClosingTag = options.whiteSpaceAtEndOfSelfclosingTag ? ' />' : '/>'
+        const selfClosingNodeClosingTag = options.whiteSpaceAtEndOfSelfclosingTag ? ' />' : '/>';
         // self-closing node
         appendContent(output, selfClosingNodeClosingTag);
     } else if (node.children.length === 0) {
         // empty node
         appendContent(output, '></' + node.name + '>');
     } else {
-
         appendContent(output, '>');
 
         output.level++;
@@ -78,7 +97,6 @@ function processElement(node, output, preserveSpace, options) {
         let nodePreserveSpace = node.attributes['xml:space'] === 'preserve';
 
         if (!nodePreserveSpace && output.options.collapseContent) {
-
             const containsTextNodes = node.children.some(function(child) {
                 return child.type === 'Text' && child.content.trim() !== '';
             });
@@ -101,12 +119,22 @@ function processElement(node, output, preserveSpace, options) {
     }
 }
 
+/**
+ * 
+ * @param {*} output 
+ * @param {*} attributes 
+ */
 function processAttributes(output, attributes) {
     Object.keys(attributes).forEach(function(attr) {
         appendContent(output, ' ' + attr + '="' + attributes[attr] + '"');
     });
 }
 
+/**
+ * 
+ * @param {*} node 
+ * @param {*} output 
+ */
 function processProcessingIntruction(node, output) {
     if (output.content.length > 0) {
         newLine(output);
@@ -115,7 +143,6 @@ function processProcessingIntruction(node, output) {
     processAttributes(output, node.attributes);
     appendContent(output, '?>');
 }
-
 
 /**
  * Converts the given XML into human readable format.
@@ -130,14 +157,11 @@ function processProcessingIntruction(node, output) {
  * @returns {string}
  */
 function format(xml, options = {}) {
-
-    options = options || {};
     options.indentation = options.indentation || '    ';
     options.collapseContent = options.collapseContent === true;
     options.lineSeparator = options.lineSeparator || '\r\n';
     options.whiteSpaceAtEndOfSelfclosingTag = !!options.whiteSpaceAtEndOfSelfclosingTag;
 
-    const parse = require('xml-parser-xo');
     const parsedXml = parse(xml, {filter: options.filter});
     const output = {content: '', level: 0, options: options};
 
@@ -151,6 +175,5 @@ function format(xml, options = {}) {
 
     return output.content;
 }
-
 
 module.exports = format;
