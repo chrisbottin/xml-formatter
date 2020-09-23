@@ -43,6 +43,10 @@ describe('XML formatter', function () {
         assertFormat('test/data4/xml*-input.xml', {}, done);
     });
 
+    it('should use single quotes for attribute that contains unescaped double quote', function(done) {
+        assertFormat('test/data8/xml*-input.xml', {}, done);
+    });
+
     it('should format XML with the custom line separator', function(done) {
         assertFormat('test/data5/xml*-input.xml', {lineSeparator: '\n'}, done);
     });
