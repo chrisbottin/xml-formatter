@@ -1,83 +1,106 @@
 /**
  * @typedef {Object} XMLFormatterOptions
- *  @property {string} [indentation='    '] The value used for indentation
+ *  @property {String} [indentation='    '] The value used for indentation
  *  @property {function(node): boolean} [filter] Return false to exclude the node.
- *  @property {boolean} [collapseContent=false] True to keep content in the same line as the element. Only works if element contains at least one text node
- *  @property {string} [lineSeparator='\r\n'] The line separator to use
- *   @property {string} [whiteSpaceAtEndOfSelfclosingTag=false] to either end ad self closing tag with `<tag/>` or `<tag />`
+ *  @property {Boolean} [collapseContent=false] True to keep content in the same line as the element. Only works if element contains at least one text node
+ *  @property {String} [lineSeparator='\r\n'] The line separator to use
+ *  @property {String} [whiteSpaceAtEndOfSelfclosingTag=false] to either end ad self closing tag with `<tag/>` or `<tag />`
  */
-
 
 /**
- * 
- * @param {*} output 
+ * @typedef {Object} XMLFormatterState
+ * @param {String} content
+ * @param {Number} level
+ * @param {XMLFormatterOptions} options
  */
-function newLine(output) {
-    output.content += output.options.lineSeparator;
+
+/**
+ * @param {XMLFormatterState} state
+ * @return {void}
+ */
+function newLine(state) {
+    state.content += state.options.lineSeparator;
     let i;
-    for (i = 0; i < output.level; i++) {
-        output.content += output.options.indentation;
+    for (i = 0; i < state.level; i++) {
+        state.content += state.options.indentation;
     }
 }
 
-function appendContent(output, content) {
-    output.content += content;
+/**
+ * @param {XMLFormatterState} state
+ * @param {String} content
+ * @return {void}
+ */
+function appendContent(state, content) {
+    state.content += content;
 }
 
 /**
- * @param {XMLFormatterOptions} options 
+ * @param {Object} node
+ * @param {XMLFormatterState} state
+ * @param {Boolean} preserveSpace
+ * @return {void}
  */
-function processNode(node, output, preserveSpace, options) {
+function processNode(node, state, preserveSpace) {
     if (typeof node.content === 'string') {
-        processContentNode(node, output, preserveSpace);
+        processContentNode(node, state, preserveSpace);
     } else if (node.type === 'Element') {
-        processElement(node, output, preserveSpace, options);
+        processElementNode(node, state, preserveSpace);
     } else if (node.type === 'ProcessingInstruction') {
-        processProcessingIntruction(node, output, preserveSpace);
+        processProcessingIntruction(node, state, preserveSpace);
     } else {
         throw new Error('Unknown node type: ' + node.type);
     }
 }
 
-function processContentNode(node, output, preserveSpace) {
+/**
+ * @param {Object} node
+ * @param {XMLFormatterState} state
+ * @param {Boolean} preserveSpace
+ * @return {void}
+ */
+function processContentNode(node, state, preserveSpace) {
     if (!preserveSpace) {
         node.content = node.content.trim();
     }
     if (node.content.length > 0) {
-        if (!preserveSpace && output.content.length > 0) {
-            newLine(output);
+        if (!preserveSpace && state.content.length > 0) {
+            newLine(state);
         }
-        appendContent(output, node.content);
+        appendContent(state, node.content);
     }
 }
 
 /**
- * @param {XMLFormatterOptions} options 
+ * @param {Object} node
+ * @param {XMLFormatterState} state
+ * @param {Boolean} preserveSpace
+ * @return {void}
  */
-function processElement(node, output, preserveSpace, options) {
-    if (!preserveSpace && output.content.length > 0) {
-        newLine(output);
+function processElementNode(node, state, preserveSpace) {
+    if (!preserveSpace && state.content.length > 0) {
+        newLine(state);
     }
 
-    appendContent(output, '<' + node.name);
-    processAttributes(output, node.attributes);
+    appendContent(state, '<' + node.name);
+    processAttributes(state, node.attributes);
 
     if (node.children === null) {
-        const selfClosingNodeClosingTag = options.whiteSpaceAtEndOfSelfclosingTag ? ' />' : '/>'
+        const selfClosingNodeClosingTag = state.options.whiteSpaceAtEndOfSelfclosingTag ? ' />' : '/>'
         // self-closing node
-        appendContent(output, selfClosingNodeClosingTag);
+        appendContent(state, selfClosingNodeClosingTag);
     } else if (node.children.length === 0) {
         // empty node
-        appendContent(output, '></' + node.name + '>');
+        appendContent(state, '></' + node.name + '>');
     } else {
 
-        appendContent(output, '>');
+        appendContent(state, '>');
 
-        output.level++;
+        state.level++;
 
         let nodePreserveSpace = node.attributes['xml:space'] === 'preserve';
 
-        if (!nodePreserveSpace && output.options.collapseContent) {
+        if (!nodePreserveSpace && state.options.collapseContent) {
 
             const containsTextNodes = node.children.some(function(child) {
                 return child.type === 'Text' && child.content.trim() !== '';
@@ -89,31 +112,41 @@ function processElement(node, output, preserveSpace, options) {
         }
 
         node.children.forEach(function(child) {
-            processNode(child, output, preserveSpace || nodePreserveSpace, options);
+            processNode(child, state, preserveSpace || nodePreserveSpace, state.options);
         });
 
-        output.level--;
+        state.level--;
 
         if (!preserveSpace && !nodePreserveSpace) {
-            newLine(output);
+            newLine(state);
         }
-        appendContent(output, '</' + node.name + '>');
+        appendContent(state, '</' + node.name + '>');
     }
 }
 
-function processAttributes(output, attributes) {
+/**
+ * @param {XMLFormatterState} state
+ * @param {Record<String, String>} attributes
+ * @return {void}
+ */
+function processAttributes(state, attributes) {
     Object.keys(attributes).forEach(function(attr) {
-        appendContent(output, ' ' + attr + '="' + attributes[attr] + '"');
+        appendContent(state, ' ' + attr + '="' + attributes[attr] + '"');
     });
 }
 
-function processProcessingIntruction(node, output) {
-    if (output.content.length > 0) {
-        newLine(output);
+/**
+ * @param {Object} node
+ * @param {XMLFormatterState} state
+ * @return {void}
+ */
+function processProcessingIntruction(node, state) {
+    if (state.content.length > 0) {
+        newLine(state);
     }
-    appendContent(output, '<?' + node.name);
-    processAttributes(output, node.attributes);
-    appendContent(output, '?>');
+    appendContent(state, '<?' + node.name);
+    processAttributes(state, node.attributes);
+    appendContent(state, '?>');
 }
 
 
@@ -122,34 +155,27 @@ function processProcessingIntruction(node, output) {
  *
  * @param {String} xml
  * @param {XMLFormatterOptions} options
- *  @config {String} [indentation='    '] The value used for indentation
- *  @config {function(node): boolean} [filter] Return false to exclude the node.
- *  @config {Boolean} [collapseContent=false] True to keep content in the same line as the element. Only works if element contains at least one text node
- *  @config {String} [lineSeparator='\r\n'] The line separator to use
- *  @config {string} [whiteSpaceAtEndOfSelfclosingTag=false] to either end with `<tag/>` or `<tag />`
  * @returns {string}
  */
 function format(xml, options = {}) {
-
-    options = options || {};
     options.indentation = options.indentation || '    ';
     options.collapseContent = options.collapseContent === true;
     options.lineSeparator = options.lineSeparator || '\r\n';
     options.whiteSpaceAtEndOfSelfclosingTag = !!options.whiteSpaceAtEndOfSelfclosingTag;
 
-    const parse = require('xml-parser-xo');
-    const parsedXml = parse(xml, {filter: options.filter});
-    const output = {content: '', level: 0, options: options};
+    const parser = require('xml-parser-xo');
+    const parsedXml = parser(xml, {filter: options.filter});
+    const state = {content: '', level: 0, options: options};
 
     if (parsedXml.declaration) {
-        processProcessingIntruction(parsedXml.declaration, output);
+        processProcessingIntruction(parsedXml.declaration, state);
     }
 
     parsedXml.children.forEach(function(child) {
-        processNode(child, output, false, options);
+        processNode(child, state, false);
     });
 
-    return output.content;
+    return state.content;
 }
 
 
