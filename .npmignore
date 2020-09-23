@@ -1,2 +1,11 @@
 node_modules
 test
+.DS_Store
+.idea
+*.iml
+.eslintignore
+.eslintrc.json
+.gitignore
+.npmignore
+.npmrc
+.travis.yml
