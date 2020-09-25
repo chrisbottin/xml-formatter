@@ -43,7 +43,7 @@ describe('XML formatter', function () {
         assertFormat('test/data4/xml*-input.xml', {}, done);
     });
 
-    it('should use single quotes for attribute that contains unescaped double quote', function(done) {
+    it('should escape a double quote in an attribute value', function(done) {
         assertFormat('test/data8/xml*-input.xml', {}, done);
     });
 

@@ -131,9 +131,8 @@ function processElementNode(node, state, preserveSpace) {
  */
 function processAttributes(state, attributes) {
     Object.keys(attributes).forEach(function(attr) {
-        const value = attributes[attr];
-        const quote = value.indexOf('"') !== -1 ? '\'' : '"';
-        appendContent(state, ' ' + attr + '=' + quote + value + quote);
+        const escaped = attributes[attr].replace(/"/g, '&quot;');
+        appendContent(state, ' ' + attr + '="' + escaped + '"');
     });
 }
 
