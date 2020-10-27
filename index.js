@@ -19,6 +19,7 @@
  * @return {void}
  */
 function newLine(state) {
+    if (!state.options.indentation) return;
     state.content += state.options.lineSeparator;
     let i;
     for (i = 0; i < state.level; i++) {
@@ -159,7 +160,7 @@ function processProcessingIntruction(node, state) {
  * @returns {string}
  */
 function format(xml, options = {}) {
-    options.indentation = options.indentation || '    ';
+    options.indentation = options.hasOwnProperty('indentation') ? options.indentation : '    ';
     options.collapseContent = options.collapseContent === true;
     options.lineSeparator = options.lineSeparator || '\r\n';
     options.whiteSpaceAtEndOfSelfclosingTag = !!options.whiteSpaceAtEndOfSelfclosingTag;

@@ -59,4 +59,8 @@ describe('XML formatter', function () {
         assertFormat('test/data7_white-space-on-closing-tag/xml*-input.xml', {whiteSpaceAtEndOfSelfclosingTag: true}, done);
     });
 
+    it('should format XML without indentation', function(done) {
+        assertFormat('test/data9/xml*-input.xml', {indentation: ''}, done);
+    });
+
 });
