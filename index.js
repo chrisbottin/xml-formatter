@@ -19,7 +19,7 @@
  * @return {void}
  */
 function newLine(state) {
-    if (!state.options.indentation) return;
+    if (!state.options.indentation && !state.options.lineSeparator) return;
     state.content += state.options.lineSeparator;
     let i;
     for (i = 0; i < state.level; i++) {
