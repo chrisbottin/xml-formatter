@@ -19,6 +19,7 @@
  * @return {void}
  */
 function newLine(state) {
+    if (!state.options.indentation && !state.options.lineSeparator) return;
     state.content += state.options.lineSeparator;
     let i;
     for (i = 0; i < state.level; i++) {
@@ -159,9 +160,9 @@ function processProcessingIntruction(node, state) {
  * @returns {string}
  */
 function format(xml, options = {}) {
-    options.indentation = options.indentation || '    ';
+    options.indentation = 'indentation' in options ? options.indentation : '    ';
     options.collapseContent = options.collapseContent === true;
-    options.lineSeparator = options.lineSeparator || '\r\n';
+    options.lineSeparator = 'lineSeparator' in options ? options.lineSeparator : '\r\n';
     options.whiteSpaceAtEndOfSelfclosingTag = !!options.whiteSpaceAtEndOfSelfclosingTag;
 
     const parser = require('xml-parser-xo');
