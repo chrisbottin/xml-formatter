@@ -5,6 +5,7 @@
  *  @property {Boolean} [collapseContent=false] True to keep content in the same line as the element. Only works if element contains at least one text node
  *  @property {String} [lineSeparator='\r\n'] The line separator to use
  *  @property {String} [whiteSpaceAtEndOfSelfclosingTag=false] to either end ad self closing tag with `<tag/>` or `<tag />`
+ *  @property {Number} [lineWrap=-1] Max character length before wrapping the line after the first attribute. All subsequent attributes will be vertically aligned with the first one.
  */
 
 /**
@@ -20,8 +21,7 @@
  */
 function newLine(state) {
     state.content += state.options.lineSeparator;
-    let i;
-    for (i = 0; i < state.level; i++) {
+    for (let i = 0; i < state.level; i++) {
         state.content += state.options.indentation;
     }
 }
@@ -83,7 +83,7 @@ function processElementNode(node, state, preserveSpace) {
     }
 
     appendContent(state, '<' + node.name);
-    processAttributes(state, node.attributes);
+    processAttributes(state, node);
 
     if (node.children === null) {
         const selfClosingNodeClosingTag = state.options.whiteSpaceAtEndOfSelfclosingTag ? ' />' : '/>'
@@ -129,10 +129,32 @@ function processElementNode(node, state, preserveSpace) {
  * @param {Record<String, String>} attributes
  * @return {void}
  */
-function processAttributes(state, attributes) {
-    Object.keys(attributes).forEach(function(attr) {
-        const escaped = attributes[attr].replace(/"/g, '&quot;');
-        appendContent(state, ' ' + attr + '="' + escaped + '"');
+function processAttributes(state, node) {
+    // let lineLength = 0;
+    let nodeIndent = 0;
+
+    if (node.type !== 'ProcessingInstruction' && state.options.lineWrap !== -1) {
+        nodeIndent = ' '.repeat(state.options.indentation.length * state.level + node.name.length + 1);
+    }
+
+    Object.keys(node.attributes).forEach(function(attr, i, arr) {
+        const escaped = node.attributes[attr].replace(/"/g, '&quot;');
+        const attributeContent = ' ' + attr + '="' + escaped + '"';
+
+        if (nodeIndent && i > 0) {
+            state.content += state.options.lineSeparator + nodeIndent;
+        }
+
+        // if (i === 0) {
+        //     lineLength = ' '.repeat(state.options.indentation.length * state.level + node.name.length + 1 + attributeContent.length);
+        //     nodeIndent = ' '.repeat(state.options.indentation.length * state.level + node.name.length + 1);
+        // } else if (i > 0 && i < arr.length - 1) {
+        //     if ((lineLength + attributeContent.length) > state.options.lineWrap) {
+        //         state.content += state.options.lineSeparator + nodeIndent;
+        //     }
+        // }
+
+        appendContent(state, attributeContent);
     });
 }
 
@@ -146,7 +168,7 @@ function processProcessingIntruction(node, state) {
         newLine(state);
     }
     appendContent(state, '<?' + node.name);
-    processAttributes(state, node.attributes);
+    processAttributes(state, node);
     appendContent(state, '?>');
 }
 
@@ -163,6 +185,7 @@ function format(xml, options = {}) {
     options.collapseContent = options.collapseContent === true;
     options.lineSeparator = options.lineSeparator || '\r\n';
     options.whiteSpaceAtEndOfSelfclosingTag = !!options.whiteSpaceAtEndOfSelfclosingTag;
+    options.lineWrap = options.lineWrap > 0 ? options.lineWrap : -1;
 
     const parser = require('xml-parser-xo');
     const parsedXml = parser(xml, {filter: options.filter});

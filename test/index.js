@@ -59,4 +59,8 @@ describe('XML formatter', function () {
         assertFormat('test/data7_white-space-on-closing-tag/xml*-input.xml', {whiteSpaceAtEndOfSelfclosingTag: true}, done);
     });
 
+    it('should wrap long lines when option is set', function(done) {
+        assertFormat('test/data9/xml*-input.xml', {lineWrap: 70}, done);
+    });
+
 });
