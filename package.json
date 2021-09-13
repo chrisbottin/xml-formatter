@@ -1,6 +1,6 @@
 {
   "name": "xml-formatter",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "repository": "github:chrisbottin/xml-formatter",
   "bugs": {
     "url": "https://github.com/chrisbottin/xml-formatter/issues"
@@ -31,13 +31,13 @@
     "preserve"
   ],
   "dependencies": {
-    "xml-parser-xo": "^3.1.1"
+    "xml-parser-xo": "^3.1.2"
   },
   "devDependencies": {
     "browserify": "^13.1.1",
-    "chai": "^4.2.0",
+    "chai": "^4.3.4",
     "eslint": "^6.8.0",
-    "glob": "^7.1.6",
+    "glob": "^7.1.7",
     "mocha": "^6.2.1"
   }
 }
