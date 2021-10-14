@@ -74,6 +74,9 @@ Output:
 
 ## On The Browser
 
+The code is transpiled using [Babel](https://babeljs.io/) with [@babel/preset-env](https://babeljs.io/docs/en/babel-preset-env) default values and bundled using [browserify](https://browserify.org/).
+
+### Using `require('xml-formatter')`
  Page:
  
 ```html
@@ -83,14 +86,29 @@ Output:
  Usage:
  
 ```js
-var format = require('xml-formatter');
+var xmlFormatter = require('xml-formatter');
 var xml = '<root><content><p xml:space="preserve">This is <b>some</b> content.</content></p>';
 
-var formattedXml = format(xml);
+var formattedXml = xmlFormatter(xml);
 console.log(formattedXml);
 ```
 
-Output:
+### Using global function `xmlFormatter`
+
+```html
+<script type="text/javascript" src="dist/browser/xml-formatter-singleton.js"></script>
+```
+
+Usage:
+
+```js
+var xml = '<root><content><p xml:space="preserve">This is <b>some</b> content.</content></p>';
+
+var formattedXml = xmlFormatter(xml);
+console.log(formattedXml);
+```
+
+### Output
 
 ```xml
 <root>
