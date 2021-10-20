@@ -102,12 +102,30 @@ function processElementNode(node, state, preserveSpace) {
         let nodePreserveSpace = node.attributes['xml:space'] === 'preserve';
 
         if (!nodePreserveSpace && state.options.collapseContent) {
+            let containsTextNodes = false;
+            let containsTextNodesWithLineBreaks = false;
+            let containsNonTextNodes = false;
 
-            const containsTextNodes = node.children.some(function(child) {
-                return child.type === 'Text' && child.content.trim() !== '';
+            node.children.forEach(function(child, index) {
+                if (child.type === 'Text') {
+                    if (child.content.includes('\n')) {
+                        containsTextNodesWithLineBreaks = true;
+                        child.content = child.content.trim();
+                    } else if (index === 0 || index === node.children.length - 1) {
+                        if (child.content.trim().length === 0) {
+                            // If the text node is at the start or end and is empty, it should be ignored when formatting
+                            child.content = '';
+                        }
+                    }
+                    if (child.content.length > 0) {
+                        containsTextNodes = true;
+                    }
+                } else {
+                    containsNonTextNodes = true;
+                }
             });
 
-            if (containsTextNodes) {
+            if (containsTextNodes && (!containsNonTextNodes || !containsTextNodesWithLineBreaks)) {
                 nodePreserveSpace = true;
             }
         }
@@ -177,7 +195,9 @@ function format(xml, options = {}) {
         processNode(child, state, false);
     });
 
-    return state.content;
+    return state.content
+        .replace(/\r\n/g, '\n')
+        .replace(/\n/g, options.lineSeparator);
 }
 
 
