@@ -1,13 +1,13 @@
 
 # xml-formatter
 
-  Converts XML into a human readable format (pretty print) while respecting the xml:space attribute.
-  
-  This module can also be used on the browser using the browserified version with a small footprint (8KB file size).
-  
-  [![Travis CI status](https://api.travis-ci.org/chrisbottin/xml-formatter.svg?branch=master)](https://travis-ci.org/chrisbottin/xml-formatter)
+Converts XML into a human readable format (pretty print) while respecting the xml:space attribute.
 
-  [![NPM](https://nodei.co/npm/xml-formatter.png?downloads=true)](https://nodei.co/npm/xml-formatter/)
+This module can also be used on the browser using the browserified version with a small footprint (8KB file size).
+
+[![Build Status](https://github.com/chrisbottin/xml-formatter/actions/workflows/ci.yml/badge.svg)](https://github.com/chrisbottin/xml-formatter/actions/workflows/ci.yml)
+
+[![NPM](https://nodei.co/npm/xml-formatter.png?downloads=true)](https://nodei.co/npm/xml-formatter/)
 
 ## Installation
 
