@@ -5,9 +5,7 @@ Converts XML into a human readable format (pretty print) while respecting the xm
 
 This module can also be used on the browser using the browserified version with a small footprint (8KB file size).
 
-[![Build Status](https://github.com/chrisbottin/xml-formatter/actions/workflows/ci.yml/badge.svg)](https://github.com/chrisbottin/xml-formatter/actions/workflows/ci.yml)
-
-[![NPM](https://nodei.co/npm/xml-formatter.png?downloads=true)](https://nodei.co/npm/xml-formatter/)
+[![Build Status](https://github.com/chrisbottin/xml-formatter/actions/workflows/ci.yml/badge.svg)](https://github.com/chrisbottin/xml-formatter/actions/workflows/ci.yml) [![npm version](https://img.shields.io/npm/v/xml-formatter.svg)](https://npmjs.org/package/xml-formatter)
 
 ## Installation
 
