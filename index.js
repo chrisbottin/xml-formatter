@@ -120,6 +120,8 @@ function processElementNode(node, state, preserveSpace) {
                     if (child.content.length > 0) {
                         containsTextNodes = true;
                     }
+                } else if (child.type === 'CDATA') {
+                    containsTextNodes = true;
                 } else {
                     containsNonTextNodes = true;
                 }
