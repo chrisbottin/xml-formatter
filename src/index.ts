@@ -1,24 +1,53 @@
-/**
- * @typedef {Object} XMLFormatterOptions
- *  @property {String} [indentation='    '] The value used for indentation
- *  @property {function(node): boolean} [filter] Return false to exclude the node.
- *  @property {Boolean} [collapseContent=false] True to keep content in the same line as the element. Only works if element contains at least one text node
- *  @property {String} [lineSeparator='\r\n'] The line separator to use
- *  @property {String} [whiteSpaceAtEndOfSelfclosingTag=false] to either end ad self closing tag with `<tag/>` or `<tag />`
- */
+import xmlParser, {
+    XmlParserElementNode,
+    XmlParserNode,
+    XmlParserProcessingInstructionNode,
+    XmlParserDocumentChildNode,
+    XmlParserElementChildNode
+} from 'xml-parser-xo';
 
-/**
- * @typedef {Object} XMLFormatterState
- * @param {String} content
- * @param {Number} level
- * @param {XMLFormatterOptions} options
- */
+export type XMLFormatterOptions = {
 
-/**
- * @param {XMLFormatterState} state
- * @return {void}
- */
-function newLine(state) {
+    /**
+     * The value used for indentation.
+     * Default = '    '
+     */
+    indentation?: string;
+
+    /**
+     * Return false to exclude the node.
+     * @param node
+     */
+    filter?: (node: any) => boolean;
+
+    /**
+     * True to remove comments
+     */
+    stripComments?: boolean;
+
+    /**
+     * True to keep content in the same line as the element. Only works if element contains at least one text node
+     */
+    collapseContent?: boolean;
+
+    /**
+     * The line separator to use
+     */
+    lineSeparator?: string;
+
+    /**
+     * To either end ad self closing tag with `<tag/>` or `<tag />`
+     */
+    whiteSpaceAtEndOfSelfclosingTag?: boolean;
+};
+
+type XMLFormatterState = {
+    content: string;
+    level: number;
+    options: XMLFormatterOptions;
+};
+
+function newLine(state: XMLFormatterState): void {
     if (!state.options.indentation && !state.options.lineSeparator) return;
     state.content += state.options.lineSeparator;
     let i;
@@ -27,58 +56,35 @@ function newLine(state) {
     }
 }
 
-/**
- * @param {XMLFormatterState} state
- * @param {String} content
- * @return {void}
- */
-function appendContent(state, content) {
+function appendContent(state: XMLFormatterState, content: string): void {
     state.content += content;
 }
 
-/**
- * @param {Object} node
- * @param {XMLFormatterState} state
- * @param {Boolean} preserveSpace
- * @return {void}
- */
-function processNode(node, state, preserveSpace) {
-    if (typeof node.content === 'string') {
-        processContentNode(node, state, preserveSpace);
+function processNode(node: XmlParserNode, state: XMLFormatterState, preserveSpace: boolean): void {
+    if (typeof (node as any).content === 'string') {
+        processContent((node as any).content, state, preserveSpace);
     } else if (node.type === 'Element') {
-        processElementNode(node, state, preserveSpace);
+        processElementNode(node as XmlParserElementNode, state, preserveSpace);
     } else if (node.type === 'ProcessingInstruction') {
-        processProcessingIntruction(node, state, preserveSpace);
+        processProcessingIntruction(node as XmlParserProcessingInstructionNode, state);
     } else {
         throw new Error('Unknown node type: ' + node.type);
     }
 }
 
-/**
- * @param {Object} node
- * @param {XMLFormatterState} state
- * @param {Boolean} preserveSpace
- * @return {void}
- */
-function processContentNode(node, state, preserveSpace) {
+function processContent(content: string, state: XMLFormatterState, preserveSpace: boolean): void {
     if (!preserveSpace) {
-        node.content = node.content.trim();
+        content = content.trim();
     }
-    if (node.content.length > 0) {
+    if (content.length > 0) {
         if (!preserveSpace && state.content.length > 0) {
             newLine(state);
         }
-        appendContent(state, node.content);
+        appendContent(state, content);
     }
 }
 
-/**
- * @param {Object} node
- * @param {XMLFormatterState} state
- * @param {Boolean} preserveSpace
- * @return {void}
- */
-function processElementNode(node, state, preserveSpace) {
+function processElementNode(node: XmlParserElementNode, state: XMLFormatterState, preserveSpace: boolean): void {
     if (!preserveSpace && state.content.length > 0) {
         newLine(state);
     }
@@ -95,6 +101,8 @@ function processElementNode(node, state, preserveSpace) {
         appendContent(state, '></' + node.name + '>');
     } else {
 
+        const nodeChildren = node.children;
+
         appendContent(state, '>');
 
         state.level++;
@@ -106,12 +114,12 @@ function processElementNode(node, state, preserveSpace) {
             let containsTextNodesWithLineBreaks = false;
             let containsNonTextNodes = false;
 
-            node.children.forEach(function(child, index) {
+            nodeChildren.forEach(function(child: XmlParserElementChildNode, index: number) {
                 if (child.type === 'Text') {
                     if (child.content.includes('\n')) {
                         containsTextNodesWithLineBreaks = true;
                         child.content = child.content.trim();
-                    } else if (index === 0 || index === node.children.length - 1) {
+                    } else if (index === 0 || index === nodeChildren.length - 1) {
                         if (child.content.trim().length === 0) {
                             // If the text node is at the start or end and is empty, it should be ignored when formatting
                             child.content = '';
@@ -132,8 +140,8 @@ function processElementNode(node, state, preserveSpace) {
             }
         }
 
-        node.children.forEach(function(child) {
-            processNode(child, state, preserveSpace || nodePreserveSpace, state.options);
+        nodeChildren.forEach(function(child: XmlParserElementChildNode) {
+            processNode(child, state, preserveSpace || nodePreserveSpace);
         });
 
         state.level--;
@@ -145,24 +153,14 @@ function processElementNode(node, state, preserveSpace) {
     }
 }
 
-/**
- * @param {XMLFormatterState} state
- * @param {Record<String, String>} attributes
- * @return {void}
- */
-function processAttributes(state, attributes) {
+function processAttributes(state: XMLFormatterState, attributes: Record<string, string>): void {
     Object.keys(attributes).forEach(function(attr) {
         const escaped = attributes[attr].replace(/"/g, '&quot;');
         appendContent(state, ' ' + attr + '="' + escaped + '"');
     });
 }
 
-/**
- * @param {Object} node
- * @param {XMLFormatterState} state
- * @return {void}
- */
-function processProcessingIntruction(node, state) {
+function processProcessingIntruction(node: XmlParserProcessingInstructionNode, state: XMLFormatterState): void {
     if (state.content.length > 0) {
         newLine(state);
     }
@@ -174,33 +172,28 @@ function processProcessingIntruction(node, state) {
 
 /**
  * Converts the given XML into human readable format.
- *
- * @param {String} xml
- * @param {XMLFormatterOptions} options
- * @returns {string}
  */
-function format(xml, options = {}) {
+function format(xml: string, options: XMLFormatterOptions = {}): string {
     options.indentation = 'indentation' in options ? options.indentation : '    ';
     options.collapseContent = options.collapseContent === true;
     options.lineSeparator = 'lineSeparator' in options ? options.lineSeparator : '\r\n';
     options.whiteSpaceAtEndOfSelfclosingTag = !!options.whiteSpaceAtEndOfSelfclosingTag;
 
-    const parser = require('xml-parser-xo');
-    const parsedXml = parser(xml, {filter: options.filter});
+    const parsedXml = xmlParser(xml, {filter: options.filter});
     const state = {content: '', level: 0, options: options};
 
     if (parsedXml.declaration) {
         processProcessingIntruction(parsedXml.declaration, state);
     }
 
-    parsedXml.children.forEach(function(child) {
+    parsedXml.children.forEach(function(child: XmlParserDocumentChildNode) {
         processNode(child, state, false);
     });
 
     return state.content
         .replace(/\r\n/g, '\n')
-        .replace(/\n/g, options.lineSeparator);
+        .replace(/\n/g, options.lineSeparator as string);
 }
 
 
-module.exports = format;
+export default format;
