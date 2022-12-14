@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Mocha Tests</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../../node_modules/mocha/mocha.css" />
+</head>
+<body>
+<div id="mocha"></div>
+
+<script src="../../node_modules/chai/chai.js"></script>
+<script src="../../node_modules/mocha/mocha.js"></script>
+<script src="../../dist/browser/xml-formatter.js"></script>
+<script src="../../dist/browser/xml-formatter-singleton.js"></script>
+
+<script class="mocha-init">
+    mocha.setup('bdd');
+    mocha.checkLeaks();
+
+    describe('xml-formatter on browser', () => {
+        const xmlInput = '<p><b>content</b></p>';
+        const xmlOutput = '<p>\n    <b>content</b>\n</p>';
+        const xmlFormatterOptions = {lineSeparator: '\n', collapseContent: true};
+
+        it('is available using require', () => {
+            const xmlFormatter = require('xml-formatter');
+            chai.assert.strictEqual(xmlFormatter(xmlInput, xmlFormatterOptions), xmlOutput);
+        });
+
+        it('is available as a standalone function', () => {
+            chai.assert.strictEqual(xmlFormatter(xmlInput, xmlFormatterOptions), xmlOutput);
+        });
+    });
+
+    mocha.run();
+</script>
+</body>
+</html>

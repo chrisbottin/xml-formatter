@@ -196,4 +196,6 @@ function format(xml: string, options: XMLFormatterOptions = {}): string {
 }
 
 
+module.exports = format;
+
 export default format;
