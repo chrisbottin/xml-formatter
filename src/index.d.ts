@@ -1,4 +1,4 @@
-type FormatOptions = {
+export type FormatOptions = {
     indentation?: string;
     filter?: (node: any) => boolean;
     stripComments?: boolean;
