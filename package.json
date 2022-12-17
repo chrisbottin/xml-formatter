@@ -37,7 +37,7 @@
     "preserve"
   ],
   "dependencies": {
-    "xml-parser-xo": "^4.0.0"
+    "xml-parser-xo": "^4.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.15.8",

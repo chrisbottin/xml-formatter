@@ -16,29 +16,34 @@ export type XMLFormatterOptions = {
 
     /**
      * Return false to exclude the node.
-     * @param node
      */
-    filter?: (node: any) => boolean;
+    filter?: (node: XmlParserNode) => boolean;
 
     /**
-     * True to remove comments
-     */
-    stripComments?: boolean;
-
-    /**
-     * True to keep content in the same line as the element. Only works if element contains at least one text node
+     * True to keep content in the same line as the element.
+     * Notes: Only works if element contains at least one text node.
+     * Default: false
      */
     collapseContent?: boolean;
 
     /**
-     * The line separator to use
+     * The line separator to use.
+     * Default: '\r\n'
      */
     lineSeparator?: string;
 
     /**
-     * To either end ad self closing tag with `<tag/>` or `<tag />`
+     * To either end ad self closing tag with `<tag/>` or `<tag />`.
+     * Default: false
      */
     whiteSpaceAtEndOfSelfclosingTag?: boolean;
+
+    /**
+     * Throw an error when XML fails to parse and get formatted.
+     * Notes: If set to `false`, the original XML is returned when an error occurs.
+     * Default: true
+     */
+    throwOnFailure?: boolean;
 };
 
 type XMLFormatterState = {
@@ -177,22 +182,30 @@ function format(xml: string, options: XMLFormatterOptions = {}): string {
     options.indentation = 'indentation' in options ? options.indentation : '    ';
     options.collapseContent = options.collapseContent === true;
     options.lineSeparator = 'lineSeparator' in options ? options.lineSeparator : '\r\n';
-    options.whiteSpaceAtEndOfSelfclosingTag = !!options.whiteSpaceAtEndOfSelfclosingTag;
+    options.whiteSpaceAtEndOfSelfclosingTag = options.whiteSpaceAtEndOfSelfclosingTag === true;
+    options.throwOnFailure = options.throwOnFailure !== false;
 
-    const parsedXml = xmlParser(xml, {filter: options.filter});
-    const state = {content: '', level: 0, options: options};
+    try {
+        const parsedXml = xmlParser(xml, {filter: options.filter});
+        const state = {content: '', level: 0, options: options};
 
-    if (parsedXml.declaration) {
-        processProcessingIntruction(parsedXml.declaration, state);
+        if (parsedXml.declaration) {
+            processProcessingIntruction(parsedXml.declaration, state);
+        }
+
+        parsedXml.children.forEach(function (child: XmlParserDocumentChildNode) {
+            processNode(child, state, false);
+        });
+
+        return state.content
+            .replace(/\r\n/g, '\n')
+            .replace(/\n/g, options.lineSeparator as string);
+    } catch (err) {
+        if (options.throwOnFailure) {
+            throw err;
+        }
+        return xml;
     }
-
-    parsedXml.children.forEach(function(child: XmlParserDocumentChildNode) {
-        processNode(child, state, false);
-    });
-
-    return state.content
-        .replace(/\r\n/g, '\n')
-        .replace(/\n/g, options.lineSeparator as string);
 }
 
 
