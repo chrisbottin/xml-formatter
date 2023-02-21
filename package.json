@@ -9,18 +9,22 @@
   "description": "Converts a XML string into a human readable format (pretty print) while respecting the xml:space attribute",
   "author": "Chris Bottin <chrisbottin@gmail.com>",
   "license": "MIT",
-  "main": "dist/index.js",
+  "main": "./dist/cjs/index.js",
+  "es2015": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "sideEffects": false,
   "scripts": {
     "lint": "eslint . --ext=js,ts",
     "clean": "rm -rf ./dist",
-    "compile": "npm run clean && npm run lint && npm run compile:commonjs && npm run compile:esnext && npm run compile:browser",
-    "compile:commonjs": "tsc --module commonjs --outDir ./dist --noEmit false",
-    "compile:esnext": "tsc --module esnext --outDir ./dist/esnext --noEmit false",
+    "compile": "npm run clean && npm run lint && npm run compile:commonjs && npm run compile:esnext && npm run compile:types && npm run compile:browser",
+    "compile:commonjs": "tsc --module commonjs --outDir ./dist/cjs --noEmit false",
+    "compile:esnext": "tsc --module esnext --outDir ./dist/esm --noEmit false",
+    "compile:types": "tsc --emitDeclarationOnly --declaration --declarationMap --outDir ./dist/types --noEmit false",
     "compile:browser": "mkdir -p ./dist/browser && npm run compile:browser:require && npm run compile:browser:singleton",
-    "compile:browser:require": "browserify -g [ babelify --presets [ @babel/preset-env ] ] -r ./dist/index.js:xml-formatter -o ./dist/browser/xml-formatter.js",
-    "compile:browser:singleton": "browserify -g [ babelify --presets [ @babel/preset-env ] ] -r ./dist/index.js:xml-formatter -o ./dist/browser/xml-formatter-singleton.js -s xmlFormatter",
-    "test": "mocha --require=ts-node/register --extension=js,ts --spec=test",
-    "prepublishOnly": "npm run test && npm run compile"
+    "compile:browser:require": "browserify -g [ babelify --presets [ @babel/preset-env ] ] -r ./dist/cjs/index.js:xml-formatter -o ./dist/browser/xml-formatter.js",
+    "compile:browser:singleton": "browserify -g [ babelify --presets [ @babel/preset-env ] ] -r ./dist/cjs/index.js:xml-formatter -o ./dist/browser/xml-formatter-singleton.js -s xmlFormatter",
+    "test": "mocha --require=ts-node/register --extension=ts --spec=test",
+    "prepublishOnly": "echo Please use publish.sh && exit 1"
   },
   "engines": {
     "node": ">= 14"
@@ -37,7 +41,7 @@
     "preserve"
   ],
   "dependencies": {
-    "xml-parser-xo": "^4.0.1"
+    "xml-parser-xo": "^4.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.15.8",
@@ -49,7 +53,7 @@
     "@typescript-eslint/eslint-plugin": "^5.37.0",
     "@typescript-eslint/parser": "^5.37.0",
     "babelify": "^10.0.0",
-    "browserify": "^13.1.1",
+    "browserify": "^17.0.0",
     "chai": "^4.3.4",
     "eslint": "^6.8.0",
     "glob": "^7.1.7",

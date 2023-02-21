@@ -24,8 +24,8 @@
         const xmlFormatterOptions = {lineSeparator: '\n', collapseContent: true};
 
         it('is available using require', () => {
-            const xmlFormatter = require('xml-formatter');
-            chai.assert.strictEqual(xmlFormatter(xmlInput, xmlFormatterOptions), xmlOutput);
+            const xmlFormat = require('xml-formatter');
+            chai.assert.strictEqual(xmlFormat(xmlInput, xmlFormatterOptions), xmlOutput);
         });
 
         it('is available as a standalone function', () => {

@@ -178,7 +178,7 @@ function processProcessingIntruction(node: XmlParserProcessingInstructionNode, s
 /**
  * Converts the given XML into human readable format.
  */
-function format(xml: string, options: XMLFormatterOptions = {}): string {
+function formatXml(xml: string, options: XMLFormatterOptions = {}): string {
     options.indentation = 'indentation' in options ? options.indentation : '    ';
     options.collapseContent = options.collapseContent === true;
     options.lineSeparator = 'lineSeparator' in options ? options.lineSeparator : '\r\n';
@@ -208,7 +208,8 @@ function format(xml: string, options: XMLFormatterOptions = {}): string {
     }
 }
 
+if (typeof module !== 'undefined' && typeof exports === 'object') {
+    module.exports = formatXml;
+}
 
-module.exports = format;
-
-export default format;
+export default formatXml;
