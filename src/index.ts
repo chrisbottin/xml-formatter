@@ -46,6 +46,8 @@ export type XMLFormatterOptions = {
     throwOnFailure?: boolean;
 };
 
+export type XMLFormatterMinifyOptions = Omit<XMLFormatterOptions, 'lineSeparator'|'indentation'>;
+
 type XMLFormatterState = {
     content: string;
     level: number;
@@ -79,7 +81,12 @@ function processNode(node: XmlParserNode, state: XMLFormatterState, preserveSpac
 
 function processContent(content: string, state: XMLFormatterState, preserveSpace: boolean): void {
     if (!preserveSpace) {
-        content = content.trim();
+        const trimmedContent = content.trim();
+        if (state.options.lineSeparator) {
+            content = trimmedContent;
+        } else if (trimmedContent.length === 0) {
+            content = trimmedContent;
+        }
     }
     if (content.length > 0) {
         if (!preserveSpace && state.content.length > 0) {
@@ -197,6 +204,10 @@ function formatXml(xml: string, options: XMLFormatterOptions = {}): string {
             processNode(child, state, false);
         });
 
+        if (!options.lineSeparator) {
+            return state.content;
+        }
+
         return state.content
             .replace(/\r\n/g, '\n')
             .replace(/\n/g, options.lineSeparator as string);
@@ -206,6 +217,10 @@ function formatXml(xml: string, options: XMLFormatterOptions = {}): string {
         }
         return xml;
     }
+}
+
+formatXml.minify = (xml: string, options: XMLFormatterMinifyOptions = {}) => {
+    return formatXml(xml, {...options, indentation: '', lineSeparator: ''});
 }
 
 if (typeof module !== 'undefined' && typeof exports === 'object') {

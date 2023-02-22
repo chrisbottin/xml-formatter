@@ -3,7 +3,9 @@
 
 Converts XML into a human readable format (pretty print) while respecting the `xml:space` attribute.
 
-This module can also be used on the browser using the browserified version with a small footprint (8KB file size).
+Reciprocally, the `xml-formatter` package can minify pretty printed XML.
+
+The `xml-formatter` package can also be used on the browser using the browserified version with a small footprint.
 
 [![Build Status](https://github.com/chrisbottin/xml-formatter/actions/workflows/ci.yml/badge.svg)](https://github.com/chrisbottin/xml-formatter/actions/workflows/ci.yml) [![npm version](https://img.shields.io/npm/v/xml-formatter.svg)](https://npmjs.org/package/xml-formatter)
 
@@ -64,6 +66,35 @@ xmlFormat('<root><!-- content --><content><p>This is <b>some</b> content.</conte
     <p>This is <b>some</b> content.</p>
   </content>
 </root>
+```
+
+## Minify mode
+
+### Usage:
+
+```js
+import xmlFormat from 'xml-formatter';
+
+const xml = `
+<root>
+  <content>
+    <p>
+        This is <b>some</b> content.
+    </p>
+  </content>
+</root>`;
+
+xmlFormat.minify(xml, {
+    filter: (node) => node.type !== 'Comment',
+    collapseContent: true
+});
+
+```
+
+### Output:
+
+```xml
+<root><content><p>This is<b>some</b>content.</p></content></root>
 ```
 
 ## On The Browser

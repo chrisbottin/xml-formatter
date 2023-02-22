@@ -19,18 +19,20 @@
     mocha.checkLeaks();
 
     describe('xml-formatter on browser', () => {
-        const xmlInput = '<p><b>content</b></p>';
-        const xmlOutput = '<p>\n    <b>content</b>\n</p>';
-        const xmlFormatterOptions = {lineSeparator: '\n', collapseContent: true};
 
         it('is available using require', () => {
             const xmlFormat = require('xml-formatter');
-            chai.assert.strictEqual(xmlFormat(xmlInput, xmlFormatterOptions), xmlOutput);
+            chai.assert.strictEqual(xmlFormat('<p><b>content</b></p>', {lineSeparator: '\n', collapseContent: true}), '<p>\n    <b>content</b>\n</p>');
         });
 
         it('is available as a standalone function', () => {
-            chai.assert.strictEqual(xmlFormatter(xmlInput, xmlFormatterOptions), xmlOutput);
+            chai.assert.strictEqual(xmlFormatter('<p><b>content</b></p>', {lineSeparator: '\n', collapseContent: true}), '<p>\n    <b>content</b>\n</p>');
         });
+
+        it('has minify function available', () => {
+            chai.assert.strictEqual(xmlFormatter.minify('<p>\n    <b>content</b>\n</p>', {}), '<p><b>content</b></p>');
+        });
+
     });
 
     mocha.run();
