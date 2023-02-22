@@ -1,4 +1,4 @@
-import xmlFormat, {XMLFormatterOptions} from '../src/index';
+import xmlFormat, {XMLFormatterMinifyOptions, XMLFormatterOptions} from '../src/index';
 import {assert} from 'chai';
 import glob from 'glob';
 import path from 'path';
@@ -6,20 +6,20 @@ import fs from 'fs';
 
 describe('XML formatter', function () {
 
-    function assertFormatError(src: string, formatterOptions?: XMLFormatterOptions) {
+    function assertFormatError(src: string, formatterOptions: XMLFormatterOptions = {}) {
         glob.sync(src).forEach(file => {
-            it('Assert: ' + path.basename(file), function() {
+            it('Assert: ' + file, function() {
                 const fileContents = fs.readFileSync(file).toString('utf8');
                 const relativeFilePath = path.relative(process.cwd(), file);
                 try {
                     const formattedContents = xmlFormat(fileContents, formatterOptions);
-                    if (formatterOptions?.throwOnFailure === false) {
+                    if (formatterOptions.throwOnFailure === false) {
                         assert.equal(formattedContents, fileContents, 'Formatted Content for ' + relativeFilePath);
                     } else {
                         assert.fail('Should fail');
                     }
                 } catch (err: any) {
-                    if (formatterOptions?.throwOnFailure === false) {
+                    if (formatterOptions.throwOnFailure === false) {
                         assert.fail('Should not fail');
                     } else {
                         assert.equal(err.message, 'Failed to parse XML');
@@ -29,19 +29,38 @@ describe('XML formatter', function () {
         });
     }
 
-    function assertFormat(src: string, formatterOptions?: XMLFormatterOptions) {
+    function assertFormat(src: string, formatterOptions: XMLFormatterOptions = {}) {
         glob.sync(src).forEach(file => {
             const outputFile = file.replace('-input', '-output');
 
-            it('Assert: ' + path.basename(outputFile), function() {
+            it('Assert: ' +  outputFile, function() {
                 const fileContents = fs.readFileSync(file).toString('utf8').trimEnd();
                 const formattedContents = xmlFormat(fileContents, formatterOptions);
                 const formattedContents2 = xmlFormat(formattedContents, formatterOptions);
                 let expectedContents = fs.readFileSync(outputFile).toString('utf8').trimEnd();
-                const lineSeparator = formatterOptions?.lineSeparator || '\r\n';
+                const lineSeparator = formatterOptions.lineSeparator ?? '\r\n';
                 const relativeFilePath = path.relative(process.cwd(), file);
 
-                expectedContents = expectedContents.replace(/\r/g, '').replace(/\n/g, lineSeparator);
+                if (lineSeparator) {
+                    expectedContents = expectedContents.replace(/\r/g, '').replace(/\n/g, lineSeparator);
+                }
+
+                assert.equal(formattedContents, expectedContents, 'Formatted Content for ' + relativeFilePath);
+                assert.equal(formattedContents2, expectedContents, 'Idempotence test for ' + relativeFilePath);
+            });
+        });
+    }
+
+    function assertMinifyFormat(src: string, formatterOptions: XMLFormatterMinifyOptions = {}) {
+        glob.sync(src).forEach(file => {
+            const outputFile = file.replace('-input', '-output');
+
+            it('Assert: ' +  outputFile, function() {
+                const fileContents = fs.readFileSync(file).toString('utf8').trimEnd();
+                const formattedContents = xmlFormat.minify(fileContents, formatterOptions);
+                const formattedContents2 = xmlFormat.minify(formattedContents, formatterOptions);
+                const expectedContents = fs.readFileSync(outputFile).toString('utf8').trimEnd();
+                const relativeFilePath = path.relative(process.cwd(), file);
 
                 assert.equal(formattedContents, expectedContents, 'Formatted Content for ' + relativeFilePath);
                 assert.equal(formattedContents2, expectedContents, 'Idempotence test for ' + relativeFilePath);
@@ -74,15 +93,19 @@ describe('XML formatter', function () {
     });
 
     context('should format XML adding a whitespace before self closing tag', function() {
-        assertFormat('test/data7_white-space-on-closing-tag/xml*-input.xml', {whiteSpaceAtEndOfSelfclosingTag: true});
+        assertFormat('test/data7/xml*-input.xml', {whiteSpaceAtEndOfSelfclosingTag: true});
     });
 
     context('should escape a double quote in an attribute value', function() {
         assertFormat('test/data8/xml*-input.xml');
     });
 
-    context('should format XML without indentation and line separation', function() {
-        assertFormat('test/data9/xml*-input.xml', {indentation: '', lineSeparator: ''});
+    context('should handle XML minification with collapseContent', function() {
+        assertMinifyFormat('test/data9/xml*-input.xml', {collapseContent: true});
+    });
+
+    context('should handle XML minification without collapseContent (default)', function() {
+        assertMinifyFormat('test/data11/xml*-input.xml');
     });
 
     context('should fail when parsing invalid XML', function() {
