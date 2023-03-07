@@ -137,7 +137,7 @@ function processElementNode(node: XmlParserElementNode, state: XMLFormatterState
                             child.content = '';
                         }
                     }
-                    if (child.content.length > 0) {
+                    if (child.content.trim().length > 0) {
                         containsTextNodes = true;
                     }
                 } else if (child.type === 'CDATA') {

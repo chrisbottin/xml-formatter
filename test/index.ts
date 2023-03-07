@@ -116,4 +116,11 @@ describe('XML formatter', function () {
         assertFormatError('test/data10/xml*-input.xml', {throwOnFailure: false});
     });
 
+    context('should format XML with spaces between tags when collapseContent=true', function() {
+        assertFormat('test/data12/xml*-input.xml', {collapseContent: true});
+    });
+
+    context('should format XML with spaces between tags when collapseContent=false', function() {
+        assertFormat('test/data12/xml*-input.xml', {collapseContent: true});
+    });
 });
