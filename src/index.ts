@@ -51,6 +51,11 @@ export type XMLFormatterOptions = {
      * Default: true
      */
     throwOnFailure?: boolean;
+
+    /**
+     * True to throw an error when parsing XML document with invalid content like mismatched closing tags.
+     */
+    strictMode?: boolean;
 };
 
 export type XMLFormatterMinifyOptions = Omit<XMLFormatterOptions, 'lineSeparator'|'indentation'>;
@@ -228,7 +233,7 @@ function formatXml(xml: string, options: XMLFormatterOptions = {}): string {
     options.throwOnFailure = options.throwOnFailure !== false;
 
     try {
-        const parsedXml = xmlParser(xml, {filter: options.filter});
+        const parsedXml = xmlParser(xml, {filter: options.filter, strictMode: options.strictMode});
         const state = {content: '', level: 0, options: options, path: []};
 
         if (parsedXml.declaration) {
