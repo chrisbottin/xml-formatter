@@ -9,6 +9,13 @@ import xmlParser, {
 export type XMLFormatterOptions = {
 
     /**
+     * List of XML element paths to ignore during formatting.
+     * This can be a partial path (element tag name) or full path starting from the document element.
+     * e.g. ['/html/head/script', 'pre']
+     */
+    ignoredPaths?: string[];
+
+    /**
      * The value used for indentation.
      * Default = '    '
      */
@@ -52,11 +59,20 @@ type XMLFormatterState = {
     content: string;
     level: number;
     options: XMLFormatterOptions;
+    path: string[];
 };
 
 function newLine(state: XMLFormatterState): void {
     if (!state.options.indentation && !state.options.lineSeparator) return;
     state.content += state.options.lineSeparator;
+    let i;
+    for (i = 0; i < state.level; i++) {
+        state.content += state.options.indentation;
+    }
+}
+
+function indent(state: XMLFormatterState): void {
+    state.content = state.content.replace(/ +$/, '');
     let i;
     for (i = 0; i < state.level; i++) {
         state.content += state.options.indentation;
@@ -96,7 +112,14 @@ function processContent(content: string, state: XMLFormatterState, preserveSpace
     }
 }
 
+function isPathMatchingIgnoredPaths(path: string[], ignoredPaths: string[]): boolean {
+    const fullPath = '/' + path.join('/');
+    const pathLastPart = path[path.length - 1];
+    return ignoredPaths.includes(pathLastPart) || ignoredPaths.includes(fullPath);
+}
+
 function processElementNode(node: XmlParserElementNode, state: XMLFormatterState, preserveSpace: boolean): void {
+    state.path.push(node.name);
     if (!preserveSpace && state.content.length > 0) {
         newLine(state);
     }
@@ -120,6 +143,12 @@ function processElementNode(node: XmlParserElementNode, state: XMLFormatterState
         state.level++;
 
         let nodePreserveSpace = node.attributes['xml:space'] === 'preserve';
+        let ignoredPath = false;
+
+        if (!nodePreserveSpace && state.options.ignoredPaths) {
+            ignoredPath = isPathMatchingIgnoredPaths(state.path, state.options.ignoredPaths);
+            nodePreserveSpace = ignoredPath;
+        }
 
         if (!nodePreserveSpace && state.options.collapseContent) {
             let containsTextNodes = false;
@@ -161,8 +190,14 @@ function processElementNode(node: XmlParserElementNode, state: XMLFormatterState
         if (!preserveSpace && !nodePreserveSpace) {
             newLine(state);
         }
+
+        if (ignoredPath) {
+            indent(state);
+        }
+
         appendContent(state, '</' + node.name + '>');
     }
+    state.path.pop();
 }
 
 function processAttributes(state: XMLFormatterState, attributes: Record<string, string>): void {
@@ -194,7 +229,7 @@ function formatXml(xml: string, options: XMLFormatterOptions = {}): string {
 
     try {
         const parsedXml = xmlParser(xml, {filter: options.filter});
-        const state = {content: '', level: 0, options: options};
+        const state = {content: '', level: 0, options: options, path: []};
 
         if (parsedXml.declaration) {
             processProcessingIntruction(parsedXml.declaration, state);

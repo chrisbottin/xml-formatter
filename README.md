@@ -37,12 +37,28 @@ xmlFormat('<root><content><p xml:space="preserve">This is <b>some</b> content.</
 
 ## Options
 
-- `filter` (`function(node) => boolean`) Function to filter out unwanted nodes by returning `false`.
-- `indentation` (String, default=`'    '`) The value used for indentation.
-- `collapseContent` (Boolean, default=`false`) True to keep content in the same line as the element. Only works if element contains at least one text node
-- `lineSeparator` (String, default=`\r\n`) Specify the line separator to use
-- `whiteSpaceAtEndOfSelfclosingTag` (Boolean, default=`false`) to either end ad self closing tag with `<tag/>` or `<tag />`
-- `throwOnFailure` (Boolean, default=`true`) Throw an error when XML fails to parse and get formatted otherwise the original XML is returned
+- `filter`: Function to filter out unwanted nodes by returning `false`.
+  - type: `function(node) => boolean`
+  - default: `() => true`
+- `ignoredPaths`: List of XML element paths to ignore during formatting. 
+This can be a partial path (element tag name) or full path starting from the document element e.g. `['/html/head/script', 'pre']`.
+  - type: `string[]`
+  - default: `[]`
+- `indentation`: The value used for indentation.
+  - type: `string`
+  - default: `'    '`
+- `collapseContent`: True to keep content in the same line as the element. Only works if element contains at least one text node.
+  - type: `boolean`
+  - default: `false`
+- `lineSeparator`: Specify the line separator to use.
+  - type: `string`
+  - default: `\r\n`
+- `whiteSpaceAtEndOfSelfclosingTag`: True to end self-closing tags with a space e.g. `<tag />`.
+  - type: `boolean`
+  - default: `false`
+- `throwOnFailure`: Throw an error when XML fails to parse and get formatted otherwise the original XML is returned.
+  - type: `boolean`
+  - default: `true`
 
 ### Usage:
  
