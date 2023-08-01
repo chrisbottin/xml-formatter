@@ -59,6 +59,9 @@ This can be a partial path (element tag name) or full path starting from the doc
 - `throwOnFailure`: Throw an error when XML fails to parse and get formatted otherwise the original XML is returned.
   - type: `boolean`
   - default: `true`
+- `forceSelfClosingEmptyTag`: True to force empty tags to be self-closing.
+  - type: `boolean`
+  - default: `false`
 
 ### Usage:
  

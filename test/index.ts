@@ -131,4 +131,8 @@ describe('XML formatter', function () {
         });
     });
 
+    context('should collapse empty tags when forceSelfClosingEmptyTag=true', function () {
+        assertFormat('test/data15/xml*-input.xml', { forceSelfClosingEmptyTag: true });
+    });
+
 });

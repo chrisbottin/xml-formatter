@@ -56,6 +56,11 @@ export type XMLFormatterOptions = {
      * True to throw an error when parsing XML document with invalid content like mismatched closing tags.
      */
     strictMode?: boolean;
+
+    /**
+     * True to force empty tags to be self-closing.
+     */
+    forceSelfClosingEmptyTag?: boolean;
 };
 
 export type XMLFormatterMinifyOptions = Omit<XMLFormatterOptions, 'lineSeparator'|'indentation'>;
@@ -132,7 +137,7 @@ function processElementNode(node: XmlParserElementNode, state: XMLFormatterState
     appendContent(state, '<' + node.name);
     processAttributes(state, node.attributes);
 
-    if (node.children === null) {
+    if (node.children === null || (state.options.forceSelfClosingEmptyTag && node.children.length === 0)) {
         const selfClosingNodeClosingTag = state.options.whiteSpaceAtEndOfSelfclosingTag ? ' />' : '/>'
         // self-closing node
         appendContent(state, selfClosingNodeClosingTag);
