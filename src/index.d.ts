@@ -5,6 +5,7 @@ export type FormatOptions = {
     collapseContent?: boolean;
     lineSeparator?: string;
     whiteSpaceAtEndOfSelfclosingTag?: boolean;
+    forceSelfClosingEmptyTag?: boolean;
 }
 
 declare function format(xml: string, options?: FormatOptions): string;
