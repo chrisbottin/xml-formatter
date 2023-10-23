@@ -134,5 +134,9 @@ describe('XML formatter', function () {
     context('should collapse empty tags when forceSelfClosingEmptyTag=true', function () {
         assertFormat('test/data15/xml*-input.xml', { forceSelfClosingEmptyTag: true });
     });
+    
+    context('should not remove space with style before differently stylised word when prettifying xml', function () {
+        assertFormat('test/data16/xml*-input.xml', { collapseContent: true });
+    });
 
 });

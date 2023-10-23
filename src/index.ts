@@ -170,7 +170,7 @@ function processElementNode(node: XmlParserElementNode, state: XMLFormatterState
                     if (child.content.includes('\n')) {
                         containsTextNodesWithLineBreaks = true;
                         child.content = child.content.trim();
-                    } else if (index === 0 || index === nodeChildren.length - 1) {
+                    } else if ((index === 0 || index === nodeChildren.length - 1) && !preserveSpace) {
                         if (child.content.trim().length === 0) {
                             // If the text node is at the start or end and is empty, it should be ignored when formatting
                             child.content = '';
