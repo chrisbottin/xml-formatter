@@ -16,10 +16,11 @@
   "scripts": {
     "lint": "eslint . --ext=js,ts",
     "clean": "rm -rf ./dist",
-    "compile": "npm run clean && npm run lint && npm run compile:commonjs && npm run compile:esnext && npm run compile:types && npm run compile:browser",
+    "compile": "npm run clean && npm run lint && npm run compile:commonjs && npm run compile:esnext && npm run compile:types && npm run compile:types:post-hook && npm run compile:browser",
     "compile:commonjs": "tsc --module commonjs --outDir ./dist/cjs --noEmit false",
     "compile:esnext": "tsc --module esnext --outDir ./dist/esm --noEmit false",
     "compile:types": "tsc --emitDeclarationOnly --declaration --declarationMap --outDir ./dist/types --noEmit false",
+    "compile:types:post-hook": "sed -i '' 's/export default/export =/g' ./dist/types/index.d.ts",
     "compile:browser": "mkdir -p ./dist/browser && npm run compile:browser:require && npm run compile:browser:singleton",
     "compile:browser:require": "browserify -g [ babelify --presets [ @babel/preset-env ] ] -r ./dist/cjs/index.js:xml-formatter -o ./dist/browser/xml-formatter.js",
     "compile:browser:singleton": "browserify -g [ babelify --presets [ @babel/preset-env ] ] -r ./dist/cjs/index.js:xml-formatter -o ./dist/browser/xml-formatter-singleton.js -s xmlFormatter",
