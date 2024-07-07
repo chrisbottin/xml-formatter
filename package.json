@@ -27,7 +27,7 @@
     "prepublishOnly": "echo Please use publish.sh && exit 1"
   },
   "engines": {
-    "node": ">= 14"
+    "node": ">= 16"
   },
   "keywords": [
     "xml",
