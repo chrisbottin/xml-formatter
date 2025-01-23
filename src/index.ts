@@ -176,7 +176,8 @@ function processElementNode(node: XmlParserElementNode, state: XMLFormatterState
                             child.content = '';
                         }
                     }
-                    if (child.content.trim().length > 0) {
+                    // If there is some content or whitespaces have been removed and there is no other siblings
+                    if (child.content.trim().length > 0 || nodeChildren.length === 1) {
                         containsTextNodes = true;
                     }
                 } else if (child.type === 'CDATA') {
