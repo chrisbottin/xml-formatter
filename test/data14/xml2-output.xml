@@ -1,0 +1,20 @@
+<html>
+    <head>
+        <script>
+        var multiline = \`
+        line 1
+        <div>
+            A
+            <span>line 2</span>
+            B
+        </div>
+        line 3
+        \`;
+
+        console.debug(
+        "My Multiline:",
+        multiline,
+        );
+        </script>
+    </head>
+</html>

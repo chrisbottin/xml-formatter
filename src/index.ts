@@ -152,7 +152,7 @@ function processElementNode(node: XmlParserElementNode, state: XMLFormatterState
 
         state.level++;
 
-        let nodePreserveSpace = node.attributes['xml:space'] === 'preserve';
+        let nodePreserveSpace = node.attributes['xml:space'] === 'preserve' || preserveSpace;
         let ignoredPath = false;
 
         if (!nodePreserveSpace && state.options.ignoredPaths) {
