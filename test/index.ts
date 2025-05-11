@@ -124,7 +124,7 @@ describe('XML formatter', function () {
         assertFormat('test/data13/xml*-input.xml', {collapseContent: false});
     });
 
-    context('should ignore formattiing on specified elements', function() {
+    context('should ignore formatting on specified elements', function() {
         assertFormat('test/data14/xml*-input.xml', {
             collapseContent: true,
             ignoredPaths: ['/html/head/script', 'pre']
