@@ -94,12 +94,12 @@ function appendContent(state: XMLFormatterState, content: string): void {
 }
 
 function processNode(node: XmlParserNode, state: XMLFormatterState, preserveSpace: boolean): void {
-    if (typeof (node as any).content === 'string') {
-        processContent((node as any).content, state, preserveSpace);
-    } else if (node.type === 'Element') {
+    if (node.type === 'Element') {
         processElementNode(node as XmlParserElementNode, state, preserveSpace);
     } else if (node.type === 'ProcessingInstruction') {
         processProcessingIntruction(node as XmlParserProcessingInstructionNode, state);
+    } else if (typeof (node as Record<string, string>).content === 'string') {
+        processContent((node as Record<string, string>).content, state, preserveSpace);
     } else {
         throw new Error('Unknown node type: ' + node.type);
     }
@@ -223,7 +223,7 @@ function processProcessingIntruction(node: XmlParserProcessingInstructionNode, s
         newLine(state);
     }
     appendContent(state, '<?' + node.name);
-    processAttributes(state, node.attributes);
+    appendContent(state, ' ' + node.content.trim());
     appendContent(state, '?>');
 }
 

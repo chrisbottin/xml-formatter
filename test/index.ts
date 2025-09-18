@@ -18,11 +18,11 @@ describe('XML formatter', function () {
                     } else {
                         assert.fail('Should fail');
                     }
-                } catch (err: any) {
+                } catch (err: unknown) {
                     if (formatterOptions.throwOnFailure === false) {
                         assert.fail('Should not fail');
                     } else {
-                        assert.equal(err.message, 'Failed to parse XML');
+                        assert.equal((err instanceof Error) ? err.message: err, 'Failed to parse XML');
                     }
                 }
             });
