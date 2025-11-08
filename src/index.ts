@@ -231,7 +231,7 @@ function processProcessingIntruction(node: XmlParserProcessingInstructionNode, s
 /**
  * Converts the given XML into human readable format.
  */
-function formatXml(xml: string, options: XMLFormatterOptions = {}): string {
+function formatXml(xml: string | Document, options: XMLFormatterOptions = {}): string {
     options.indentation = 'indentation' in options ? options.indentation : '    ';
     options.collapseContent = options.collapseContent === true;
     options.lineSeparator = 'lineSeparator' in options ? options.lineSeparator : '\r\n';
@@ -239,7 +239,7 @@ function formatXml(xml: string, options: XMLFormatterOptions = {}): string {
     options.throwOnFailure = options.throwOnFailure !== false;
 
     try {
-        const parsedXml = xmlParser(xml, {filter: options.filter, strictMode: options.strictMode});
+        let parsedXml: Document = typeof xml === 'string' ? xmlParser(xml, {filter: options.filter, strictMode: options.strictMode}) : xml as Document;
         const state = {content: '', level: 0, options: options, path: []};
 
         if (parsedXml.declaration) {
@@ -261,7 +261,7 @@ function formatXml(xml: string, options: XMLFormatterOptions = {}): string {
         if (options.throwOnFailure) {
             throw err;
         }
-        return xml;
+        return xml as string;
     }
 }
 
