@@ -1,0 +1,3 @@
+<root>
+    <element embeddedSingle="pre'post" embeddedDouble="pre&quot;post" noQuotes="asdf"/>
+</root>
