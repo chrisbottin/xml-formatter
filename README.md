@@ -62,7 +62,7 @@ This can be a partial path (element tag name) or full path starting from the doc
 - `forceSelfClosingEmptyTag`: True to force empty tags to be self-closing.
   - type: `boolean`
   - default: `false`
-- `delimitAttributesInSingleQuotes`: True to use single quotes instead of double quotes as attribute delimiters.
+- `singleQuoteAttributes`: True to use single quotes instead of double quotes as attribute delimiters.
   - type: `boolean`
   - default: `false`
 

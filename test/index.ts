@@ -140,10 +140,10 @@ describe('XML formatter', function () {
     });
 
     context('use single quote attribute delimiter', function () {
-        assertFormat('test/data17/xml-single*-input.xml', { delimitAttributesInSingleQuotes: true });
+        assertFormat('test/data17/xml-single*-input.xml', { singleQuoteAttributes: true });
     });
 
     context('use double quote attribute delimiter', function () {
-        assertFormat('test/data17/xml-double*-input.xml', { delimitAttributesInSingleQuotes: false });
+        assertFormat('test/data17/xml-double*-input.xml', { singleQuoteAttributes: false });
     });
 });
