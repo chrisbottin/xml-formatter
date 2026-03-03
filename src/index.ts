@@ -61,6 +61,15 @@ export type XMLFormatterOptions = {
      * True to force empty tags to be self-closing.
      */
     forceSelfClosingEmptyTag?: boolean;
+
+    /**
+     * The quote characters that are used as attribute delimiter.
+     * Valid options are 
+     * - 'single' to use single quotes 
+     * - 'double' to use double quotes
+     * Default: 'double'
+     */
+    attributeQuotes?: 'double'|'single';
 };
 
 export type XMLFormatterMinifyOptions = Omit<XMLFormatterOptions, 'lineSeparator'|'indentation'>;
@@ -213,8 +222,14 @@ function processElementNode(node: XmlParserElementNode, state: XMLFormatterState
 
 function processAttributes(state: XMLFormatterState, attributes: Record<string, string>): void {
     Object.keys(attributes).forEach(function(attr) {
-        const escaped = attributes[attr].replace(/"/g, '&quot;');
-        appendContent(state, ' ' + attr + '="' + escaped + '"');
+        if(state.options.attributeQuotes === 'single') {
+            const escaped = attributes[attr].replace(/'/g, '&apos;');
+            appendContent(state, " " + attr + "='" + escaped + "'");
+        }
+        else {
+            const escaped = attributes[attr].replace(/"/g, '&quot;');
+            appendContent(state, ' ' + attr + '="' + escaped + '"');
+        }
     });
 }
 
@@ -237,6 +252,7 @@ function formatXml(xml: string, options: XMLFormatterOptions = {}): string {
     options.lineSeparator = 'lineSeparator' in options ? options.lineSeparator : '\r\n';
     options.whiteSpaceAtEndOfSelfclosingTag = options.whiteSpaceAtEndOfSelfclosingTag === true;
     options.throwOnFailure = options.throwOnFailure !== false;
+    options.attributeQuotes = 'attributeQuotes' in options ? options.attributeQuotes : 'double';
 
     try {
         const parsedXml = xmlParser(xml, {filter: options.filter, strictMode: options.strictMode});

@@ -139,4 +139,11 @@ describe('XML formatter', function () {
         assertFormat('test/data16/xml*-input.xml', { collapseContent: true });
     });
 
+    context('use single quote attribute delimiter', function () {
+        assertFormat('test/data17/xml-single*-input.xml', { attributeQuotes: 'single' });
+    });
+
+    context('use double quote attribute delimiter', function () {
+        assertFormat('test/data17/xml-double*-input.xml', { attributeQuotes: 'double' });
+    });
 });
