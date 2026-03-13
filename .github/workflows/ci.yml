@@ -1,26 +1,35 @@
-name: Node.js CI
+name: CI
 
 on:
   push:
     branches: [ master, feature/* ]
+
   pull_request:
     branches: [ master, feature/* ]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [16.x, 18.x, 20.x, 22.x]
+        node-version: [20.x, 22.x, 24.x, 26.x]
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm test
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Use Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install NPM Dependencies
+        run: npm ci
+
+      - name: Run Compile to ensure it compiles correctly
+        run: npm run compile
+
+      - name: Run Tests
+        run: npm run test

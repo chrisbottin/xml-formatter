@@ -224,7 +224,7 @@ function processAttributes(state: XMLFormatterState, attributes: Record<string, 
     Object.keys(attributes).forEach(function(attr) {
         if(state.options.attributeQuotes === 'single') {
             const escaped = attributes[attr].replace(/'/g, '&apos;');
-            appendContent(state, " " + attr + "='" + escaped + "'");
+            appendContent(state, ' ' + attr + '=\'' + escaped + '\'');
         }
         else {
             const escaped = attributes[attr].replace(/"/g, '&quot;');
