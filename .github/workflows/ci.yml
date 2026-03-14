@@ -25,11 +25,11 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
-      - name: Install Chrome
-        uses: browser-actions/setup-chrome@v2
-
       - name: Install NPM Dependencies
         run: npm ci --ignore-scripts
+
+      - name: Install Chrome
+        run: npx puppeteer browsers install chrome
 
       - name: Run Compile
         run: npm run compile

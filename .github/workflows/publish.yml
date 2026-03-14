@@ -34,7 +34,7 @@ jobs:
         run: npm ci --ignore-scripts
 
       - name: Install Chrome
-        uses: browser-actions/setup-chrome@v2
+        run: npx puppeteer browsers install chrome
 
       - name: Publish to NPM
         run: ./.github/scripts/publish.sh
