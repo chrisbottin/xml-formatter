@@ -1,0 +1,39 @@
+name: Publish to NPM
+
+on:
+    workflow_dispatch:
+      inputs:
+        versionBump:
+          description: 'Version Bump (patch, minor, major)'
+          type: choice
+          options:
+            - patch
+            - minor
+            - major
+          required: true
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - name: Install NPM Dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Publish to NPM
+        run: ./.github/scripts/publish.sh
+        env:
+          VERSION_BUMP: ${{ github.event.inputs.versionBump }}

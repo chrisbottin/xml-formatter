@@ -26,9 +26,9 @@ jobs:
           cache: 'npm'
 
       - name: Install NPM Dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
 
-      - name: Run Compile to ensure it compiles correctly
+      - name: Run Compile
         run: npm run compile
 
       - name: Run Tests

@@ -40,8 +40,7 @@ xmlFormat('<root><content><p xml:space="preserve">This is <b>some</b> content.</
 - `filter`: Function to filter out unwanted nodes by returning `false`.
   - type: `function(node) => boolean`
   - default: `() => true`
-- `ignoredPaths`: List of XML element paths to ignore during formatting. 
-This can be a partial path (element tag name) or full path starting from the document element e.g. `['/html/head/script', 'pre']`.
+- `ignoredPaths`: List of XML element paths to ignore during formatting. This can be a partial path (element tag name) or full path starting from the document element e.g. `['/html/head/script', 'pre']`.
   - type: `string[]`
   - default: `[]`
 - `indentation`: The value used for indentation.
@@ -62,10 +61,7 @@ This can be a partial path (element tag name) or full path starting from the doc
 - `forceSelfClosingEmptyTag`: True to force empty tags to be self-closing.
   - type: `boolean`
   - default: `false`
-- `attributeQuotes`: The quote characters that are used as attribute delimiters.
-  - Valid options are 
-    - 'single' to use single quotes 
-    - 'double' to use double quotes
+- `attributeQuotes`: The quote characters to use as attribute delimiters. Valid options are `'single'` fo single quotes and `'double'` for double quotes.
   - type: `'double|single'`
   - default: `'double'`
 

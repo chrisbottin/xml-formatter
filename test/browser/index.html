@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <title>Mocha Tests</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="#" />
     <link rel="stylesheet" href="../../node_modules/mocha/mocha.css" />
 </head>
 <body>
@@ -26,7 +27,7 @@
         });
 
         it('is available as a standalone function', () => {
-            chai.assert.strictEqual(xmlFormatter('<p><b>content</b></p>', {lineSeparator: '\n', collapseContent: true}), '<p>\n    <b>content</b>\n</p>');
+            chai.assert.strictEqual(xmlFormatter('<p><b>contentss</b></p>', {lineSeparator: '\n', collapseContent: true}), '<p>\n    <b>content</b>\n</p>');
         });
 
         it('has minify function available', () => {
