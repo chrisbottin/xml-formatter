@@ -31,7 +31,7 @@ async function main(): Promise<void> {
 
     let browser: Browser | undefined;
     try {
-        browser = await puppeteer.launch({ headless: true });
+        browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
         const page = await browser.newPage();
 
         // Collect console output for debugging
@@ -75,7 +75,7 @@ async function main(): Promise<void> {
             }
             process.exitCode = 1;
         } else {
-            console.log(`${chalk.green('✓')} All browser tests passed`);
+            console.log(`${chalk.green('✔')} All browser tests passed`);
         }
     } catch (err) {
         console.error('Browser test runner error:', err);

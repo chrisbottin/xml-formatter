@@ -27,7 +27,7 @@
         });
 
         it('is available as a standalone function', () => {
-            chai.assert.strictEqual(xmlFormatter('<p><b>contentss</b></p>', {lineSeparator: '\n', collapseContent: true}), '<p>\n    <b>content</b>\n</p>');
+            chai.assert.strictEqual(xmlFormatter('<p><b>content</b></p>', {lineSeparator: '\n', collapseContent: true}), '<p>\n    <b>content</b>\n</p>');
         });
 
         it('has minify function available', () => {
