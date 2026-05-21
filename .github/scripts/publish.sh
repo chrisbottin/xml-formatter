@@ -10,7 +10,7 @@ echo "                                                              |___/ "
 echo "This script will publish a new version to NPM, create a version bump git commit, tag it and push it."
 
 branchName=`git rev-parse --abbrev-ref HEAD`
-mainBranchName="main"
+mainBranchName="master"
 
 if [[ $branchName != ${mainBranchName} ]]; then
   echo "Current branch is $branchName. Only the main branch can be published."
@@ -25,7 +25,7 @@ npm run test
 
 npm version $VERSION_BUMP -m "Version Bump to %s ($VERSION_BUMP)"
 
-newVersion=`npm view . --silent version`
+newVersion=`node -e "console.log(require('./package.json').version);"`
 
 git tag $newVersion
 
