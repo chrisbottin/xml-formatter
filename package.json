@@ -59,7 +59,7 @@
     "browserify": "^17.0.0",
     "chai": "^4.3.4",
     "eslint": "^10.0.0",
-    "globals": "^15.0.0",
+    "globals": "^17.0.0",
     "mocha": "^11.0.0",
     "puppeteer": "^25.0.0",
     "serve": "^14.2.6",
