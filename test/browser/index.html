@@ -10,12 +10,13 @@
 <body>
 <div id="mocha"></div>
 
-<script src="../../node_modules/chai/chai.js"></script>
 <script src="../../node_modules/mocha/mocha.js"></script>
 <script src="../../dist/browser/xml-formatter.js"></script>
 <script src="../../dist/browser/xml-formatter-singleton.js"></script>
 
-<script class="mocha-init">
+<script class="mocha-init" type="module">
+    import {assert} from '../../node_modules/chai/index.js';
+
     mocha.setup('bdd');
     mocha.checkLeaks();
 
@@ -23,15 +24,15 @@
 
         it('is available using require', () => {
             const xmlFormat = require('xml-formatter');
-            chai.assert.strictEqual(xmlFormat('<p><b>content</b></p>', {lineSeparator: '\n', collapseContent: true}), '<p>\n    <b>content</b>\n</p>');
+            assert.strictEqual(xmlFormat('<p><b>content</b></p>', {lineSeparator: '\n', collapseContent: true}), '<p>\n    <b>content</b>\n</p>');
         });
 
         it('is available as a standalone function', () => {
-            chai.assert.strictEqual(xmlFormatter('<p><b>content</b></p>', {lineSeparator: '\n', collapseContent: true}), '<p>\n    <b>content</b>\n</p>');
+            assert.strictEqual(xmlFormatter('<p><b>content</b></p>', {lineSeparator: '\n', collapseContent: true}), '<p>\n    <b>content</b>\n</p>');
         });
 
         it('has minify function available', () => {
-            chai.assert.strictEqual(xmlFormatter.minify('<p>\n    <b>content</b>\n</p>', {}), '<p><b>content</b></p>');
+            assert.strictEqual(xmlFormatter.minify('<p>\n    <b>content</b>\n</p>', {}), '<p><b>content</b></p>');
         });
 
     });
