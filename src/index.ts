@@ -106,7 +106,7 @@ function processNode(node: XmlParserNode, state: XMLFormatterState, preserveSpac
     if (node.type === 'Element') {
         processElementNode(node as XmlParserElementNode, state, preserveSpace);
     } else if (node.type === 'ProcessingInstruction') {
-        processProcessingIntruction(node as XmlParserProcessingInstructionNode, state);
+        processProcessingInstruction(node as XmlParserProcessingInstructionNode, state, preserveSpace);
     } else if (typeof (node as Record<string, string>).content === 'string') {
         processContent((node as Record<string, string>).content, state, preserveSpace);
     } else {
@@ -233,8 +233,8 @@ function processAttributes(state: XMLFormatterState, attributes: Record<string, 
     });
 }
 
-function processProcessingIntruction(node: XmlParserProcessingInstructionNode, state: XMLFormatterState): void {
-    if (state.content.length > 0) {
+function processProcessingInstruction(node: XmlParserProcessingInstructionNode, state: XMLFormatterState, preserveSpace: boolean): void {
+    if (!preserveSpace && state.content.length > 0) {
         newLine(state);
     }
     appendContent(state, '<?' + node.name);
@@ -259,7 +259,7 @@ function formatXml(xml: string, options: XMLFormatterOptions = {}): string {
         const state = {content: '', level: 0, options: options, path: []};
 
         if (parsedXml.declaration) {
-            processProcessingIntruction(parsedXml.declaration, state);
+            processProcessingInstruction(parsedXml.declaration, state, false);
         }
 
         parsedXml.children.forEach(function (child: XmlParserDocumentChildNode) {
